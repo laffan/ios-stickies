@@ -1,0 +1,48 @@
+// Stickies — one place to configure the project.
+//
+// Edit the three values below, then build. Everything else (bundle IDs,
+// entitlements, App Group container, widget extension) is derived from them.
+
+// 1. Your Apple Developer Team ID (Xcode ▸ Settings ▸ Accounts ▸ Manage Certificates).
+//    Leave empty to build for the simulator / "Sign to Run Locally" on macOS.
+DEVELOPMENT_TEAM =
+
+// 2. A reverse-DNS bundle identifier you own.
+APP_BUNDLE_ID = com.example.stickies
+
+// 3. The App Group that the app and its widgets use to share the folder
+//    bookmark and the widget snapshot. It MUST start with "group." and it
+//    MUST be registered on developer.apple.com for the team above.
+APP_GROUP_ID = group.com.example.stickies
+
+// ---------------------------------------------------------------------------
+// Derived — you shouldn't need to touch anything below here.
+// ---------------------------------------------------------------------------
+
+WIDGET_BUNDLE_ID = $(APP_BUNDLE_ID).widgets
+
+// macOS requires App Group identifiers to carry the team prefix, iOS forbids
+// it. Both the entitlements and the Info.plists read these, so the app and its
+// widgets always agree on which container to use.
+MACOS_APP_GROUP_ID = $(DEVELOPMENT_TEAM).$(APP_GROUP_ID)
+EFFECTIVE_APP_GROUP_ID = $(APP_GROUP_ID)
+EFFECTIVE_APP_GROUP_ID[sdk=macosx*] = $(MACOS_APP_GROUP_ID)
+
+MARKETING_VERSION = 1.0
+CURRENT_PROJECT_VERSION = 1
+
+IPHONEOS_DEPLOYMENT_TARGET = 17.0
+MACOSX_DEPLOYMENT_TARGET = 14.0
+
+SWIFT_VERSION = 5.0
+SWIFT_STRICT_CONCURRENCY = minimal
+SWIFT_EMIT_LOC_STRINGS = YES
+ENABLE_USER_SCRIPT_SANDBOXING = YES
+
+SUPPORTED_PLATFORMS = iphoneos iphonesimulator macosx
+SUPPORTS_MACCATALYST = NO
+SUPPORTS_MAC_DESIGNED_FOR_IPHONE = NO
+TARGETED_DEVICE_FAMILY = 1,2
+
+CODE_SIGN_STYLE = Automatic
+CODE_SIGN_IDENTITY[sdk=macosx*] = -

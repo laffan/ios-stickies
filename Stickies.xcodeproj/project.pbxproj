@@ -1,0 +1,691 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 56;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		0432CA589A541336BFD47AFB /* AppGroup.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E85CD6BE4C5ED4FB335A8F9 /* AppGroup.swift */; };
+		0FBB5AD8BC1979E190981758 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = ED45F7F873BBF0B9A13035DC /* Assets.xcassets */; };
+		13092359B2D8EAB72079C258 /* StickyIntents.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0136A1B6E3229693EF9896C7 /* StickyIntents.swift */; };
+		18DE0927DC55953F883A2720 /* NoteListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A547159E7733A3675B55541 /* NoteListView.swift */; };
+		1F32D295CD24B40C59F3DD98 /* FolderAccess.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3213AC58319E6DC9219ACCCA /* FolderAccess.swift */; };
+		285121D373E1F2BA0778EAF8 /* StickyColor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BAEC92F7A3947BBC57828CD /* StickyColor.swift */; };
+		2DB358E080C3AED9C7C0B798 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 89E32102D1E00199A720A8B7 /* Assets.xcassets */; };
+		3055D616E47596BCDB157489 /* StickyViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 942CB8D72561886050C1087C /* StickyViews.swift */; };
+		41A9AAA97DAEFED63835AADB /* DoubleStickyWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = F48E0907F6266F1A3FEC9DAD /* DoubleStickyWidget.swift */; };
+		42A190C91AF01CD021F4C056 /* MarkdownBodyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1CB83A4CD3FBC5421D408ECD /* MarkdownBodyView.swift */; };
+		488F4A4055DC0085EAA4292E /* StickyLibrary.swift in Sources */ = {isa = PBXBuildFile; fileRef = B7DE86A287BAC41C3B1FCEB0 /* StickyLibrary.swift */; };
+		520314879331E6A1F01553FF /* NoteFileIO.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27DACC4F685C3B0B529C3759 /* NoteFileIO.swift */; };
+		5B5D20085A38EE9EE2307634 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10EAB708A76085AA4426150C /* SettingsView.swift */; };
+		615AEED1408DADE38C39F875 /* AppGroup.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E85CD6BE4C5ED4FB335A8F9 /* AppGroup.swift */; };
+		6250D3C2913586D33E0FE014 /* StickiesWidgetBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = F0B6AE329128A99C367A1F76 /* StickiesWidgetBundle.swift */; };
+		646A41B5F95C09872917ED44 /* StickyTimeline.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6ADCABA0674F835137FA314 /* StickyTimeline.swift */; };
+		6FB6B2B21B84F75DF89E3505 /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3BF032146932C9BF9CBEBA73 /* RootView.swift */; };
+		72CECADAA0B1DCF6AF167B64 /* StickyViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 942CB8D72561886050C1087C /* StickyViews.swift */; };
+		77DD7675C057880F67E963F2 /* LockScreenStickyWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = C58487C85AAB391E45E6F8D8 /* LockScreenStickyWidget.swift */; };
+		794E0268BB90364535E82FB0 /* SingleStickyWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = BAA4E183F02118052B1F95CB /* SingleStickyWidget.swift */; };
+		83BE19931FA6807F9EC1B305 /* Note.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BE5EB937CBD4FEDB4746AFA /* Note.swift */; };
+		8A993134DB03D98681DF596C /* WidgetSnapshotStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8670B135F7F4CAF9A8C2100 /* WidgetSnapshotStore.swift */; };
+		8B1E48F72CC6021A6E7C59E0 /* FolderAccess.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3213AC58319E6DC9219ACCCA /* FolderAccess.swift */; };
+		8BBB2D6FFD36BFE812A95F03 /* NoteFile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60912C17FBCA8EFFAE7BAE67 /* NoteFile.swift */; };
+		8F4046A1099BE5F996E03857 /* FolderWatcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = B7BD53FE3EF0B74EBA01DF26 /* FolderWatcher.swift */; };
+		9054E1B64D0779A48D4F7944 /* NoteStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8C68CE4D508DF3E45F78974 /* NoteStore.swift */; };
+		9991BF761E208F160045A6E5 /* WidgetSnapshotStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8670B135F7F4CAF9A8C2100 /* WidgetSnapshotStore.swift */; };
+		9EFD2E65B8889621BD1994C7 /* MarkdownBodyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1CB83A4CD3FBC5421D408ECD /* MarkdownBodyView.swift */; };
+		A8B16A397822B58C786D7A5C /* NoteFile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60912C17FBCA8EFFAE7BAE67 /* NoteFile.swift */; };
+		AB8750F0FDCA4C46BD17FD69 /* StickiesApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52E1A085AC44F582D01E8FE5 /* StickiesApp.swift */; };
+		B2139DA0DF2EBA1120255E5E /* WelcomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 090C793793DEAF2450E28E9C /* WelcomeView.swift */; };
+		C01027725292EDBF2D9E6918 /* StickiesWidgets.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = DC16309B0B9B22DD9F3266DE /* StickiesWidgets.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		CF7B1457014330CF9493B522 /* MarkdownParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = D171A8D286D5CAACE241E3CE /* MarkdownParser.swift */; };
+		D400FAD23334DE8F43C2465A /* NoteEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 13BBE6835227F0D4C26FD098 /* NoteEntity.swift */; };
+		D4077F8C4408E0C2A544263E /* StickyColor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BAEC92F7A3947BBC57828CD /* StickyColor.swift */; };
+		D60DBDE042D801C7E66FAC79 /* MarkdownParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = D171A8D286D5CAACE241E3CE /* MarkdownParser.swift */; };
+		E4C400BFD73B2B1F576F0627 /* Note.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BE5EB937CBD4FEDB4746AFA /* Note.swift */; };
+		F123CC0814CAB9ED5303B74E /* NoteStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8C68CE4D508DF3E45F78974 /* NoteStore.swift */; };
+		F141B03B151C73BED4A75DF3 /* FolderWatcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = B7BD53FE3EF0B74EBA01DF26 /* FolderWatcher.swift */; };
+		F4C5BB816F3C2EB4CD95A48F /* NoteEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C99BB6A05FED6BC1ACB96786 /* NoteEditorView.swift */; };
+		FA1155E4D86B571A0F175A23 /* StickyLibrary.swift in Sources */ = {isa = PBXBuildFile; fileRef = B7DE86A287BAC41C3B1FCEB0 /* StickyLibrary.swift */; };
+		FB562BC87F7FF146E1FC13D4 /* NoteFileIO.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27DACC4F685C3B0B529C3759 /* NoteFileIO.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		48F92B84299B55FADFE3AC58 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 46F86FAA6BBF9AC94A7E4595 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = F2B95E444A80634DE17648E6;
+			remoteInfo = StickiesWidgets;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXNativeTarget section */
+		751FA77A05A06BC3A623BCC1 /* Stickies */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 207A6B225B8DFB0CA7958127 /* Build configuration list for PBXNativeTarget "Stickies" */;
+			buildPhases = (
+				6BA94528253B0E10E91DD97E,
+				15C1B5C48B2AFA7AAFA2FC06,
+				E0D792CE068887FCA759A2A9,
+				708A8C3D32C0EA29DFCB8C0D,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				3BE1ED9111C497222CAD8CF4 /* PBXTargetDependency */,
+			);
+			name = Stickies;
+			productName = Stickies;
+			productReference = 0109FAC6FF6190B9A0610D60 /* Stickies.app */;
+			productType = "com.apple.product-type.application";
+		};
+		F2B95E444A80634DE17648E6 /* StickiesWidgets */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = C68EE3B005DF0D8CE59857E4 /* Build configuration list for PBXNativeTarget "StickiesWidgets" */;
+			buildPhases = (
+				F04065537ECCB7F778BD48E2,
+				64CC173E01BD2ECDEAAC8FF2,
+				95CAF9F71B37A5CF1723F659,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = StickiesWidgets;
+			productName = StickiesWidgets;
+			productReference = DC16309B0B9B22DD9F3266DE /* StickiesWidgets.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXTargetDependency section */
+		3BE1ED9111C497222CAD8CF4 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = F2B95E444A80634DE17648E6 /* StickiesWidgets */;
+			targetProxy = 48F92B84299B55FADFE3AC58 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin PBXFileReference section */
+		0109FAC6FF6190B9A0610D60 /* Stickies.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Stickies.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		0136A1B6E3229693EF9896C7 /* StickyIntents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = StickyIntents.swift; path = StickyIntents.swift; sourceTree = "<group>"; };
+		090C793793DEAF2450E28E9C /* WelcomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = WelcomeView.swift; path = WelcomeView.swift; sourceTree = "<group>"; };
+		10EAB708A76085AA4426150C /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = SettingsView.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		13BBE6835227F0D4C26FD098 /* NoteEntity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = NoteEntity.swift; path = NoteEntity.swift; sourceTree = "<group>"; };
+		1CB83A4CD3FBC5421D408ECD /* MarkdownBodyView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = MarkdownBodyView.swift; path = MarkdownBodyView.swift; sourceTree = "<group>"; };
+		1F6FB61BD97C8FCECDC7A5DE /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = Info.plist; path = Info.plist; sourceTree = "<group>"; };
+		2329360E7BBBA25503543017 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = Info.plist; path = Info.plist; sourceTree = "<group>"; };
+		27DACC4F685C3B0B529C3759 /* NoteFileIO.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = NoteFileIO.swift; path = NoteFileIO.swift; sourceTree = "<group>"; };
+		2E85CD6BE4C5ED4FB335A8F9 /* AppGroup.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AppGroup.swift; path = AppGroup.swift; sourceTree = "<group>"; };
+		3213AC58319E6DC9219ACCCA /* FolderAccess.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = FolderAccess.swift; path = FolderAccess.swift; sourceTree = "<group>"; };
+		327B4671275F8456B741F330 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; name = README.md; path = README.md; sourceTree = "<group>"; };
+		367068741CB421106E2F6597 /* StickiesWidgets-macOS.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = "StickiesWidgets-macOS.entitlements"; path = "StickiesWidgets-macOS.entitlements"; sourceTree = "<group>"; };
+		3B1DA0FAD103B626F1F55F6B /* Base.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = Base.xcconfig; path = Base.xcconfig; sourceTree = "<group>"; };
+		3BF032146932C9BF9CBEBA73 /* RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = RootView.swift; path = RootView.swift; sourceTree = "<group>"; };
+		4BE5EB937CBD4FEDB4746AFA /* Note.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = Note.swift; path = Note.swift; sourceTree = "<group>"; };
+		52E1A085AC44F582D01E8FE5 /* StickiesApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = StickiesApp.swift; path = StickiesApp.swift; sourceTree = "<group>"; };
+		5F0D3F173A0A4A1C8E204FEB /* Stickies-iOS.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = "Stickies-iOS.entitlements"; path = "Stickies-iOS.entitlements"; sourceTree = "<group>"; };
+		60912C17FBCA8EFFAE7BAE67 /* NoteFile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = NoteFile.swift; path = NoteFile.swift; sourceTree = "<group>"; };
+		673E0EF3A6BB335510AFA33A /* Stickies-macOS.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = "Stickies-macOS.entitlements"; path = "Stickies-macOS.entitlements"; sourceTree = "<group>"; };
+		6BAEC92F7A3947BBC57828CD /* StickyColor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = StickyColor.swift; path = StickyColor.swift; sourceTree = "<group>"; };
+		6BF4CDBAE0312F0A8633ED7F /* generate_icons.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; name = generate_icons.py; path = generate_icons.py; sourceTree = "<group>"; };
+		89E32102D1E00199A720A8B7 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Assets.xcassets; path = Assets.xcassets; sourceTree = "<group>"; };
+		942CB8D72561886050C1087C /* StickyViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = StickyViews.swift; path = StickyViews.swift; sourceTree = "<group>"; };
+		9A547159E7733A3675B55541 /* NoteListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = NoteListView.swift; path = NoteListView.swift; sourceTree = "<group>"; };
+		A3471F2C37D8ACEB2CB690EE /* generate_xcodeproj.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; name = generate_xcodeproj.py; path = generate_xcodeproj.py; sourceTree = "<group>"; };
+		B6ADCABA0674F835137FA314 /* StickyTimeline.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = StickyTimeline.swift; path = StickyTimeline.swift; sourceTree = "<group>"; };
+		B7BD53FE3EF0B74EBA01DF26 /* FolderWatcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = FolderWatcher.swift; path = FolderWatcher.swift; sourceTree = "<group>"; };
+		B7DE86A287BAC41C3B1FCEB0 /* StickyLibrary.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = StickyLibrary.swift; path = StickyLibrary.swift; sourceTree = "<group>"; };
+		BA9322958E7B47071FB5D3F0 /* StickiesWidgets-iOS.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = "StickiesWidgets-iOS.entitlements"; path = "StickiesWidgets-iOS.entitlements"; sourceTree = "<group>"; };
+		BAA4E183F02118052B1F95CB /* SingleStickyWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = SingleStickyWidget.swift; path = SingleStickyWidget.swift; sourceTree = "<group>"; };
+		C58487C85AAB391E45E6F8D8 /* LockScreenStickyWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = LockScreenStickyWidget.swift; path = LockScreenStickyWidget.swift; sourceTree = "<group>"; };
+		C8670B135F7F4CAF9A8C2100 /* WidgetSnapshotStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = WidgetSnapshotStore.swift; path = WidgetSnapshotStore.swift; sourceTree = "<group>"; };
+		C99BB6A05FED6BC1ACB96786 /* NoteEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = NoteEditorView.swift; path = NoteEditorView.swift; sourceTree = "<group>"; };
+		D171A8D286D5CAACE241E3CE /* MarkdownParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = MarkdownParser.swift; path = MarkdownParser.swift; sourceTree = "<group>"; };
+		DC16309B0B9B22DD9F3266DE /* StickiesWidgets.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = StickiesWidgets.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		E8C68CE4D508DF3E45F78974 /* NoteStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = NoteStore.swift; path = NoteStore.swift; sourceTree = "<group>"; };
+		ED45F7F873BBF0B9A13035DC /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Assets.xcassets; path = Assets.xcassets; sourceTree = "<group>"; };
+		F0B6AE329128A99C367A1F76 /* StickiesWidgetBundle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = StickiesWidgetBundle.swift; path = StickiesWidgetBundle.swift; sourceTree = "<group>"; };
+		F48E0907F6266F1A3FEC9DAD /* DoubleStickyWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = DoubleStickyWidget.swift; path = DoubleStickyWidget.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXGroup section */
+		7F817A8EDF99EC519ED5B39F /* App/Resources */ = {
+			isa = PBXGroup;
+			children = (
+				ED45F7F873BBF0B9A13035DC /* Assets.xcassets */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
+		AC6545EDE5A39074A15E6244 /* App */ = {
+			isa = PBXGroup;
+			children = (
+				7F817A8EDF99EC519ED5B39F /* Resources */,
+				2329360E7BBBA25503543017 /* Info.plist */,
+				C99BB6A05FED6BC1ACB96786 /* NoteEditorView.swift */,
+				9A547159E7733A3675B55541 /* NoteListView.swift */,
+				3BF032146932C9BF9CBEBA73 /* RootView.swift */,
+				10EAB708A76085AA4426150C /* SettingsView.swift */,
+				5F0D3F173A0A4A1C8E204FEB /* Stickies-iOS.entitlements */,
+				673E0EF3A6BB335510AFA33A /* Stickies-macOS.entitlements */,
+				52E1A085AC44F582D01E8FE5 /* StickiesApp.swift */,
+				090C793793DEAF2450E28E9C /* WelcomeView.swift */,
+			);
+			path = App;
+			sourceTree = "<group>";
+		};
+		88427A1B1B4BBADDE600D482 /* Config */ = {
+			isa = PBXGroup;
+			children = (
+				3B1DA0FAD103B626F1F55F6B /* Base.xcconfig */,
+			);
+			path = Config;
+			sourceTree = "<group>";
+		};
+		9A8F767139E53C844793C4B4 /* Shared/Markdown */ = {
+			isa = PBXGroup;
+			children = (
+				1CB83A4CD3FBC5421D408ECD /* MarkdownBodyView.swift */,
+				D171A8D286D5CAACE241E3CE /* MarkdownParser.swift */,
+			);
+			path = Markdown;
+			sourceTree = "<group>";
+		};
+		ADEDFBCF460080BE80EC2B78 /* Shared/Model */ = {
+			isa = PBXGroup;
+			children = (
+				4BE5EB937CBD4FEDB4746AFA /* Note.swift */,
+				60912C17FBCA8EFFAE7BAE67 /* NoteFile.swift */,
+				6BAEC92F7A3947BBC57828CD /* StickyColor.swift */,
+			);
+			path = Model;
+			sourceTree = "<group>";
+		};
+		F88748ABED5CFE89CEECE306 /* Shared/Storage */ = {
+			isa = PBXGroup;
+			children = (
+				2E85CD6BE4C5ED4FB335A8F9 /* AppGroup.swift */,
+				3213AC58319E6DC9219ACCCA /* FolderAccess.swift */,
+				B7BD53FE3EF0B74EBA01DF26 /* FolderWatcher.swift */,
+				27DACC4F685C3B0B529C3759 /* NoteFileIO.swift */,
+				E8C68CE4D508DF3E45F78974 /* NoteStore.swift */,
+				B7DE86A287BAC41C3B1FCEB0 /* StickyLibrary.swift */,
+				C8670B135F7F4CAF9A8C2100 /* WidgetSnapshotStore.swift */,
+			);
+			path = Storage;
+			sourceTree = "<group>";
+		};
+		0FBA977372182A1DA1E0DAD5 /* Shared/UI */ = {
+			isa = PBXGroup;
+			children = (
+				942CB8D72561886050C1087C /* StickyViews.swift */,
+			);
+			path = UI;
+			sourceTree = "<group>";
+		};
+		51B141E1E5C40FEE5FD5E5B6 /* Shared */ = {
+			isa = PBXGroup;
+			children = (
+				9A8F767139E53C844793C4B4 /* Markdown */,
+				ADEDFBCF460080BE80EC2B78 /* Model */,
+				F88748ABED5CFE89CEECE306 /* Storage */,
+				0FBA977372182A1DA1E0DAD5 /* UI */,
+			);
+			path = Shared;
+			sourceTree = "<group>";
+		};
+		8A2D143FF87BB8FA978B9C94 /* Tools */ = {
+			isa = PBXGroup;
+			children = (
+				6BF4CDBAE0312F0A8633ED7F /* generate_icons.py */,
+				A3471F2C37D8ACEB2CB690EE /* generate_xcodeproj.py */,
+			);
+			path = Tools;
+			sourceTree = "<group>";
+		};
+		913D0A47B0823E4315B0EC7C /* Widgets/Resources */ = {
+			isa = PBXGroup;
+			children = (
+				89E32102D1E00199A720A8B7 /* Assets.xcassets */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
+		7CA040A2C43A6335A5F98448 /* Widgets */ = {
+			isa = PBXGroup;
+			children = (
+				913D0A47B0823E4315B0EC7C /* Resources */,
+				F48E0907F6266F1A3FEC9DAD /* DoubleStickyWidget.swift */,
+				1F6FB61BD97C8FCECDC7A5DE /* Info.plist */,
+				C58487C85AAB391E45E6F8D8 /* LockScreenStickyWidget.swift */,
+				13BBE6835227F0D4C26FD098 /* NoteEntity.swift */,
+				BAA4E183F02118052B1F95CB /* SingleStickyWidget.swift */,
+				F0B6AE329128A99C367A1F76 /* StickiesWidgetBundle.swift */,
+				BA9322958E7B47071FB5D3F0 /* StickiesWidgets-iOS.entitlements */,
+				367068741CB421106E2F6597 /* StickiesWidgets-macOS.entitlements */,
+				0136A1B6E3229693EF9896C7 /* StickyIntents.swift */,
+				B6ADCABA0674F835137FA314 /* StickyTimeline.swift */,
+			);
+			path = Widgets;
+			sourceTree = "<group>";
+		};
+		17F256149C150F24744854F9 /* Stickies */ = {
+			isa = PBXGroup;
+			children = (
+				AC6545EDE5A39074A15E6244 /* App */,
+				88427A1B1B4BBADDE600D482 /* Config */,
+				51B141E1E5C40FEE5FD5E5B6 /* Shared */,
+				8A2D143FF87BB8FA978B9C94 /* Tools */,
+				7CA040A2C43A6335A5F98448 /* Widgets */,
+				327B4671275F8456B741F330 /* README.md */,
+				08E6EFA53DDAC9B63DAB9836 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		08E6EFA53DDAC9B63DAB9836 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				0109FAC6FF6190B9A0610D60 /* Stickies.app */,
+				DC16309B0B9B22DD9F3266DE /* StickiesWidgets.appex */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		708A8C3D32C0EA29DFCB8C0D /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				C01027725292EDBF2D9E6918 /* StickiesWidgets.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		15C1B5C48B2AFA7AAFA2FC06 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		64CC173E01BD2ECDEAAC8FF2 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXResourcesBuildPhase section */
+		E0D792CE068887FCA759A2A9 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				0FBB5AD8BC1979E190981758 /* Assets.xcassets */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		95CAF9F71B37A5CF1723F659 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				2DB358E080C3AED9C7C0B798 /* Assets.xcassets */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		6BA94528253B0E10E91DD97E /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				42A190C91AF01CD021F4C056 /* MarkdownBodyView.swift */,
+				D60DBDE042D801C7E66FAC79 /* MarkdownParser.swift */,
+				E4C400BFD73B2B1F576F0627 /* Note.swift */,
+				8BBB2D6FFD36BFE812A95F03 /* NoteFile.swift */,
+				285121D373E1F2BA0778EAF8 /* StickyColor.swift */,
+				0432CA589A541336BFD47AFB /* AppGroup.swift */,
+				8B1E48F72CC6021A6E7C59E0 /* FolderAccess.swift */,
+				F141B03B151C73BED4A75DF3 /* FolderWatcher.swift */,
+				520314879331E6A1F01553FF /* NoteFileIO.swift */,
+				F123CC0814CAB9ED5303B74E /* NoteStore.swift */,
+				488F4A4055DC0085EAA4292E /* StickyLibrary.swift */,
+				9991BF761E208F160045A6E5 /* WidgetSnapshotStore.swift */,
+				72CECADAA0B1DCF6AF167B64 /* StickyViews.swift */,
+				F4C5BB816F3C2EB4CD95A48F /* NoteEditorView.swift */,
+				18DE0927DC55953F883A2720 /* NoteListView.swift */,
+				6FB6B2B21B84F75DF89E3505 /* RootView.swift */,
+				5B5D20085A38EE9EE2307634 /* SettingsView.swift */,
+				AB8750F0FDCA4C46BD17FD69 /* StickiesApp.swift */,
+				B2139DA0DF2EBA1120255E5E /* WelcomeView.swift */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		F04065537ECCB7F778BD48E2 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				9EFD2E65B8889621BD1994C7 /* MarkdownBodyView.swift */,
+				CF7B1457014330CF9493B522 /* MarkdownParser.swift */,
+				83BE19931FA6807F9EC1B305 /* Note.swift */,
+				A8B16A397822B58C786D7A5C /* NoteFile.swift */,
+				D4077F8C4408E0C2A544263E /* StickyColor.swift */,
+				615AEED1408DADE38C39F875 /* AppGroup.swift */,
+				1F32D295CD24B40C59F3DD98 /* FolderAccess.swift */,
+				8F4046A1099BE5F996E03857 /* FolderWatcher.swift */,
+				FB562BC87F7FF146E1FC13D4 /* NoteFileIO.swift */,
+				9054E1B64D0779A48D4F7944 /* NoteStore.swift */,
+				FA1155E4D86B571A0F175A23 /* StickyLibrary.swift */,
+				8A993134DB03D98681DF596C /* WidgetSnapshotStore.swift */,
+				3055D616E47596BCDB157489 /* StickyViews.swift */,
+				41A9AAA97DAEFED63835AADB /* DoubleStickyWidget.swift */,
+				77DD7675C057880F67E963F2 /* LockScreenStickyWidget.swift */,
+				D400FAD23334DE8F43C2465A /* NoteEntity.swift */,
+				794E0268BB90364535E82FB0 /* SingleStickyWidget.swift */,
+				6250D3C2913586D33E0FE014 /* StickiesWidgetBundle.swift */,
+				13092359B2D8EAB72079C258 /* StickyIntents.swift */,
+				646A41B5F95C09872917ED44 /* StickyTimeline.swift */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXProject section */
+		46F86FAA6BBF9AC94A7E4595 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1540;
+				LastUpgradeCheck = 1540;
+				TargetAttributes = {
+					751FA77A05A06BC3A623BCC1 = {
+						CreatedOnToolsVersion = 15.4;
+					};
+					F2B95E444A80634DE17648E6 = {
+						CreatedOnToolsVersion = 15.4;
+					};
+				};
+			};
+			buildConfigurationList = 206E9D735AFA5C2237370B91 /* Build configuration list for PBXProject "Stickies" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 17F256149C150F24744854F9;
+			productRefGroup = 08E6EFA53DDAC9B63DAB9836 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				751FA77A05A06BC3A623BCC1 /* Stickies */,
+				F2B95E444A80634DE17648E6 /* StickiesWidgets */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin XCBuildConfiguration section */
+		C8BB0D2AA4C60E3778423644 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 3B1DA0FAD103B626F1F55F6B /* Base.xcconfig */;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		CB853D24FE4072A4F8E8ED7D /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 3B1DA0FAD103B626F1F55F6B /* Base.xcconfig */;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		30F74132281CABB2E049E7C4 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = "App/Stickies-iOS.entitlements";
+				"CODE_SIGN_ENTITLEMENTS[sdk=macosx*]" = "App/Stickies-macOS.entitlements";
+				COMBINE_HIDPI_IMAGES = YES;
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = App/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "$(APP_BUNDLE_ID)";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		E33BC644804512500E8B841B /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = "App/Stickies-iOS.entitlements";
+				"CODE_SIGN_ENTITLEMENTS[sdk=macosx*]" = "App/Stickies-macOS.entitlements";
+				COMBINE_HIDPI_IMAGES = YES;
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = App/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "$(APP_BUNDLE_ID)";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
+		B8384D9217C7ADEDBB9E36C7 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CODE_SIGN_ENTITLEMENTS = "Widgets/StickiesWidgets-iOS.entitlements";
+				"CODE_SIGN_ENTITLEMENTS[sdk=macosx*]" = "Widgets/StickiesWidgets-macOS.entitlements";
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = Widgets/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@executable_path/../../../../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "$(WIDGET_BUNDLE_ID)";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+			};
+			name = Debug;
+		};
+		35B1DB29873E4CD049D0F57A /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CODE_SIGN_ENTITLEMENTS = "Widgets/StickiesWidgets-iOS.entitlements";
+				"CODE_SIGN_ENTITLEMENTS[sdk=macosx*]" = "Widgets/StickiesWidgets-macOS.entitlements";
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = Widgets/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@executable_path/../../../../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "$(WIDGET_BUNDLE_ID)";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		206E9D735AFA5C2237370B91 /* Build configuration list for PBXProject "Stickies" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				C8BB0D2AA4C60E3778423644 /* Debug */,
+				CB853D24FE4072A4F8E8ED7D /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		207A6B225B8DFB0CA7958127 /* Build configuration list for PBXNativeTarget "Stickies" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				30F74132281CABB2E049E7C4 /* Debug */,
+				E33BC644804512500E8B841B /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		C68EE3B005DF0D8CE59857E4 /* Build configuration list for PBXNativeTarget "StickiesWidgets" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				B8384D9217C7ADEDBB9E36C7 /* Debug */,
+				35B1DB29873E4CD049D0F57A /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 46F86FAA6BBF9AC94A7E4595 /* Project object */;
+}
