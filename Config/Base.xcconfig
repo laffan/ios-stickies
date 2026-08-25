@@ -16,12 +16,18 @@ DEVELOPMENT_TEAM =
 // 2. A reverse-DNS bundle identifier nobody else has registered. It does not
 //    have to be a domain you own; it does have to be unique across all Apple
 //    developer accounts, so put your own name in it.
-APP_BUNDLE_ID = com.example.stickies
+//
+//    Change it HERE and nowhere else. The widget's identifier is derived from
+//    it below, and the two must stay in step — editing the field in Xcode's
+//    Signing & Capabilities pane writes a per-target override that renames the
+//    app but not the widget, and the build then fails with "Embedded binary's
+//    bundle identifier is not prefixed with the parent app's".
+APP_BUNDLE_ID = com.example.iosstickies
 
 // 3. The App Group the app and its widgets use to share the folder bookmark and
 //    the widget snapshot. Must start with "group." — never with your team ID,
 //    on either platform. See "Registering the App Group" in the README.
-APP_GROUP_ID = group.com.example.stickies
+APP_GROUP_ID = group.com.example.iosstickies
 
 // 4. The name shown under the icon. The Xcode target stays "Stickies"; this is
 //    only what the user sees, so change it if you'd rather not share a name

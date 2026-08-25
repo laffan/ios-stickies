@@ -52,9 +52,14 @@ obvious ones are taken. Step 2 is mandatory.
 
    ```
    DEVELOPMENT_TEAM = ABCDE12345
-   APP_BUNDLE_ID    = com.yourname.stickies
-   APP_GROUP_ID     = group.com.yourname.stickies
+   APP_BUNDLE_ID    = com.yourname.iosstickies
+   APP_GROUP_ID     = group.com.yourname.iosstickies
    ```
+
+   Change the bundle identifier **here and nowhere else**. The widget's
+   identifier is derived from it, and the two have to stay in step; typing a
+   new one into Xcode's Signing & Capabilities pane writes a per-target
+   override that renames the app but not the widget.
 
    `APP_BUNDLE_ID` doesn't need to be a domain you own, but it does have to be
    unique across all of Apple's developer accounts — put your own name in it.
@@ -107,6 +112,7 @@ and `com.yourname.stickies.widgets` App IDs and select the group in each.
 | `No profiles for 'com.example.stickies' were found` | Same cause — the App ID doesn't exist, so there's nothing to make a profile from. |
 | `Provisioning profile … doesn't support the ….group.… App Group` | The App Group isn't registered, or isn't enabled on that target's App ID. It has to be on **both** the app and the widget. |
 | `Communication with Apple failed. (Application Group identifiers should start with 'group.')` | Something put a team-prefixed identifier in an entitlements file. `APP_GROUP_ID` must be the bare `group.…` form — see the note above. |
+| `Embedded binary's bundle identifier is not prefixed with the parent app's bundle identifier` | The app's identifier was changed somewhere that doesn't feed the widget's. Set `APP_BUNDLE_ID` in the xcconfig, then check the app target's Build Settings for a bold (overridden) **Product Bundle Identifier** and delete it so it reads `$(APP_BUNDLE_ID)` again. |
 | `Disabling hardened runtime with ad-hoc codesigning` | Only a note, not an error. It appears on macOS when no team is set yet. |
 
 Xcode registers identifiers on your account as it goes, so a failed attempt can

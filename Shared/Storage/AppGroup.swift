@@ -19,7 +19,7 @@ enum AppGroup {
         if let value, !value.isEmpty, !value.hasPrefix("$(") {
             return value
         }
-        return "group.com.example.stickies"
+        return "group.com.example.iosstickies"
     }()
 
     /// The team ID, published through Info.plist purely so the container
