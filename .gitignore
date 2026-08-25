@@ -1,4 +1,5 @@
 # Xcode
+Config/Local.xcconfig
 build/
 DerivedData/
 *.xcuserstate
