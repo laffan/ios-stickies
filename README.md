@@ -43,9 +43,9 @@ the larger slot below it.
 
 Requirements: **Xcode 15 or later**, iOS 17+, macOS 14+.
 
-**The project does not build as checked out** — the placeholder identifiers are
-fake on purpose, and Apple won't register `com.example.*` to anybody. Step 2 is
-mandatory.
+**The project does not build as checked out.** The placeholder identifiers are
+examples; bundle IDs are unique across every Apple developer account, and the
+obvious ones are taken. Step 2 is mandatory.
 
 1. Open `Stickies.xcodeproj`.
 2. Open `Config/Base.xcconfig` and replace the placeholders:
@@ -56,10 +56,11 @@ mandatory.
    APP_GROUP_ID     = group.com.yourname.stickies
    ```
 
-   `APP_BUNDLE_ID` just has to be unique to you — it doesn't need to be a domain
-   you actually own. `APP_GROUP_ID` must start with `group.`. To keep your own
-   identifiers out of git, put the same settings in `Config/Local.xcconfig`
-   instead; it's ignored by git and included last, so it wins.
+   `APP_BUNDLE_ID` doesn't need to be a domain you own, but it does have to be
+   unique across all of Apple's developer accounts — put your own name in it.
+   `APP_GROUP_ID` must start with `group.`. To keep your identifiers out of git,
+   put the same settings in `Config/Local.xcconfig` instead; it's ignored by git
+   and included last, so it wins.
 3. Register the App Group (see below).
 4. Pick the **Stickies** scheme and run on an iOS or macOS destination.
 
@@ -85,12 +86,18 @@ If Xcode won't do it, create it by hand at
 then enable the **App Groups** capability on both the `com.yourname.stickies`
 and `com.yourname.stickies.widgets` App IDs and select the group in each.
 
-> **macOS App Group naming.** macOS requires the team ID as a prefix
-> (`ABCDE12345.group.…`) while iOS forbids it. The xcconfig builds both forms
-> and hands the right one to each platform's entitlements and Info.plist, so
-> you only ever type the `group.…` form. Xcode reports the fully-qualified
-> `TEAMID.group.…` name in signing errors on both platforms; that's just how
-> the portal names it, not a sign that the wrong form was used.
+> **Never put your team ID in the App Group entitlement**, on either platform.
+> Apple's portal stores a group's identifier without the prefix (it keeps the
+> prefix in a separate field) and rejects anything not starting with `group.`.
+> A team-prefixed literal in an entitlements file makes Xcode try to register a
+> group under that name and fail with *"Application Group identifiers should
+> start with 'group.'"* — and because one multiplatform target gets a single
+> `UNIVERSAL` App ID, a macOS-only entitlement leaks into iOS builds too.
+>
+> macOS does still keep its group container under `~/Library/Group
+> Containers/<team>.<group>`. `AppGroup.swift` handles that at runtime: the
+> team ID reaches the app through Info.plist, and the container lookup tries
+> the bare identifier first, then the prefixed one. Nothing to configure.
 
 ### If the build fails
 
@@ -98,8 +105,14 @@ and `com.yourname.stickies.widgets` App IDs and select the group in each.
 | --- | --- |
 | `The app identifier "com.example.stickies" cannot be registered to your development team` | Step 2 wasn't done. `com.example.*` can't be registered by anyone. |
 | `No profiles for 'com.example.stickies' were found` | Same cause — the App ID doesn't exist, so there's nothing to make a profile from. |
-| `Provisioning profile … doesn't support the ….group.… App Group` | The App Group isn't registered, or isn't enabled on that target's App ID. See above — it has to be on **both** the app and the widget. |
+| `Provisioning profile … doesn't support the ….group.… App Group` | The App Group isn't registered, or isn't enabled on that target's App ID. It has to be on **both** the app and the widget. |
+| `Communication with Apple failed. (Application Group identifiers should start with 'group.')` | Something put a team-prefixed identifier in an entitlements file. `APP_GROUP_ID` must be the bare `group.…` form — see the note above. |
 | `Disabling hardened runtime with ad-hoc codesigning` | Only a note, not an error. It appears on macOS when no team is set yet. |
+
+Xcode registers identifiers on your account as it goes, so a failed attempt can
+leave a stale bundle ID or App Group behind. They're harmless, but you can tidy
+them up under [Identifiers](https://developer.apple.com/account/resources/identifiers/list)
+once you're building.
 
 None of this is about the name **Stickies** — it isn't reserved, and the target
 name doesn't collide with the Stickies app that ships with macOS (that one is
