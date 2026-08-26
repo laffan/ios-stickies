@@ -1,5 +1,8 @@
 import SwiftUI
 
+/// The note and its widget preview are the same object: one sticky, at widget
+/// proportions, that you write directly onto. Writing shows the markdown
+/// source; stepping away renders it exactly as a widget will.
 struct NoteEditorView: View {
     @Environment(NoteStore.self) private var store
     @Binding var selection: Note.ID?
@@ -15,24 +18,42 @@ struct NoteEditorView: View {
     @State private var isRenaming = false
     @State private var renameText = ""
     @State private var isConfirmingDelete = false
+    /// Writing versus looking at the finished sticky. Both are the same card
+    /// at the same size, so nothing shifts as you switch between them.
+    @State private var isWriting = false
+    @FocusState private var editorFocused: Bool
 
-    #if os(iOS)
-    @Environment(\.horizontalSizeClass) private var horizontalSizeClass
-    private var isWideLayout: Bool { horizontalSizeClass == .regular }
-    #else
-    private var isWideLayout: Bool { true }
-    #endif
+    private let presentation = StickyPresentation.editing
 
     private var currentNote: Note? { store.note(id: selection) }
+
+    /// The card draws the fold once, so the rendered content mustn't draw
+    /// its own on top of it.
+    private var contentPresentation: StickyPresentation {
+        var presentation = self.presentation
+        presentation.showsFold = false
+        return presentation
+    }
 
     var body: some View {
         Group {
             if let note = currentNote {
-                editor(for: note)
+                surface(for: note)
                     .navigationTitle(note.title)
                     .onChange(of: note) { _, updated in sync(with: updated) }
                     .onAppear { sync(with: note) }
                     .onDisappear { flushSave(for: loadedID) }
+                    // Focus follows the mode, and the mode follows focus:
+                    // tapping the sticky starts writing, tapping away renders.
+                    .onChange(of: isWriting) { _, writing in
+                        editorFocused = writing
+                    }
+                    .onChange(of: editorFocused) { _, focused in
+                        if !focused, isWriting {
+                            isWriting = false
+                            flushSave(for: loadedID)
+                        }
+                    }
                     .toolbar { toolbar(for: note) }
                     .alert("Rename File", isPresented: $isRenaming) {
                         TextField("File name", text: $renameText)
@@ -63,77 +84,55 @@ struct NoteEditorView: View {
         }
     }
 
-    // MARK: - Layout
+    // MARK: - The sticky
 
-    @ViewBuilder
-    private func editor(for note: Note) -> some View {
-        if isWideLayout {
-            HStack(alignment: .top, spacing: 0) {
-                editorColumn(for: note)
-                Divider()
-                previewColumn(for: note)
-                    .frame(width: 240)
-            }
-        } else {
-            VStack(spacing: 0) {
-                editorColumn(for: note)
-                Divider()
-                previewColumn(for: note)
-                    .frame(height: 180)
-            }
-        }
-    }
-
-    private func editorColumn(for note: Note) -> some View {
-        VStack(alignment: .leading, spacing: 12) {
+    private func surface(for note: Note) -> some View {
+        VStack(spacing: 14) {
             colorPicker
 
             if let conflictingBody {
                 conflictBanner(theirs: conflictingBody)
             }
 
-            TextEditor(text: boundedDraft)
-                .font(.system(size: 15))
-                .lineSpacing(3)
-                .scrollContentBackground(.hidden)
-                .padding(10)
-                .background(
-                    RoundedRectangle(cornerRadius: 10, style: .continuous)
-                        .fill(color.paperTop.opacity(0.22))
-                )
-                .overlay(
-                    RoundedRectangle(cornerRadius: 10, style: .continuous)
-                        .stroke(color.fold.opacity(0.5), lineWidth: 1)
-                )
-                .frame(minHeight: 160)
+            stickyCard(for: note)
 
             footer(for: note)
         }
-        .padding(16)
+        .padding(18)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+        .background(Color.primary.opacity(0.045))
     }
 
-    private func previewColumn(for note: Note) -> some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Text("Widget preview")
-                .font(.caption.weight(.semibold))
-                .foregroundStyle(.secondary)
+    private func stickyCard(for note: Note) -> some View {
+        ZStack(alignment: .topLeading) {
+            StickyPaper(color: color)
 
-            StickyCard(note: previewNote(from: note), presentation: .editorPreview)
-                .aspectRatio(1, contentMode: .fit)
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-
-            Text("Markdown is rendered the same way in widgets.")
-                .font(.caption2)
-                .foregroundStyle(.tertiary)
-                .fixedSize(horizontal: false, vertical: true)
+            if isWriting {
+                TextEditor(text: boundedDraft)
+                    .font(.system(size: presentation.scaledBase))
+                    .foregroundStyle(color.ink)
+                    .tint(color.ink)
+                    .scrollContentBackground(.hidden)
+                    .background(Color.clear)
+                    .focused($editorFocused)
+                    // TextEditor keeps a small inset of its own; trimming the
+                    // padding lands the first character where the rendered
+                    // note's first character sits.
+                    .padding(max(0, presentation.scaledPadding - 5))
+            } else {
+                StickyContent(note: previewNote(from: note), presentation: contentPresentation)
+            }
         }
-        .padding(16)
-        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
-        .background(Color.primary.opacity(0.035))
+        .overlay { StickyFold(color: color, size: presentation.scaledFold) }
+        .clipShape(RoundedRectangle(cornerRadius: presentation.cornerRadius, style: .continuous))
+        .shadow(color: .black.opacity(0.18), radius: 8, y: 3)
+        .aspectRatio(1, contentMode: .fit)
+        .frame(maxWidth: 460, maxHeight: .infinity)
+        .contentShape(RoundedRectangle(cornerRadius: presentation.cornerRadius, style: .continuous))
+        .onTapGesture { beginWriting() }
     }
 
-    /// The note as it would look right now, including unsaved keystrokes.
+    /// The note as it stands right now, including unsaved keystrokes.
     private func previewNote(from note: Note) -> Note {
         var preview = note
         preview.body = draft
@@ -176,12 +175,18 @@ struct NoteEditorView: View {
 
             Spacer()
 
-            Text(note.fileName)
-                .font(.caption.monospaced())
-                .foregroundStyle(.tertiary)
-                .lineLimit(1)
-                .truncationMode(.middle)
-                .help("This file name is what widgets remember.")
+            if isWriting {
+                Text("Markdown renders when you finish")
+                    .font(.caption)
+                    .foregroundStyle(.tertiary)
+            } else {
+                Text(note.fileName)
+                    .font(.caption.monospaced())
+                    .foregroundStyle(.tertiary)
+                    .lineLimit(1)
+                    .truncationMode(.middle)
+                    .help("This file name is what widgets remember.")
+            }
         }
     }
 
@@ -235,6 +240,17 @@ struct NoteEditorView: View {
     @ToolbarContentBuilder
     private func toolbar(for note: Note) -> some ToolbarContent {
         ToolbarItem(placement: .primaryAction) {
+            Button {
+                if isWriting { endWriting() } else { beginWriting() }
+            } label: {
+                Label(
+                    isWriting ? "Preview" : "Write",
+                    systemImage: isWriting ? "eye" : "square.and.pencil"
+                )
+            }
+        }
+
+        ToolbarItem {
             Menu {
                 Button {
                     renameText = note.fileName
@@ -252,6 +268,21 @@ struct NoteEditorView: View {
                 Label("Sticky Actions", systemImage: "ellipsis.circle")
             }
         }
+    }
+
+    // MARK: - Writing mode
+
+    /// Setting the mode is enough — the `onChange` above moves focus once the
+    /// editor is actually in the hierarchy, which setting focus here would be
+    /// too early to do.
+    private func beginWriting() {
+        guard !isWriting else { return }
+        isWriting = true
+    }
+
+    private func endWriting() {
+        isWriting = false
+        flushSave(for: loadedID)
     }
 
     // MARK: - Editing plumbing
@@ -285,6 +316,8 @@ struct NoteEditorView: View {
             baseline = note.body
             color = note.color
             conflictingBody = nil
+            editorFocused = false
+            isWriting = false
             return
         }
 

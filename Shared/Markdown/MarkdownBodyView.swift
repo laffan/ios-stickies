@@ -1,6 +1,6 @@
 import SwiftUI
 
-/// Type sizes and spacing for rendered markdown.
+/// Type sizes, spacing and ink for rendered markdown.
 ///
 /// Widgets pass a `scale` below 1 — that's how the stacked two-sticky widget
 /// gets its smaller text without a second set of views.
@@ -10,6 +10,7 @@ struct MarkdownStyle: Equatable {
     var blockSpacing: CGFloat
     var ink: Color
     var secondaryInk: Color
+    var linkInk: Color
 
     static func sticky(color: StickyColor, baseSize: CGFloat, scale: CGFloat = 1) -> MarkdownStyle {
         MarkdownStyle(
@@ -17,7 +18,11 @@ struct MarkdownStyle: Equatable {
             lineSpacing: (baseSize * scale * 0.18).rounded(),
             blockSpacing: max(2, (baseSize * scale * 0.42).rounded()),
             ink: color.ink,
-            secondaryInk: color.secondaryInk
+            secondaryInk: color.secondaryInk,
+            // One deep navy across the whole palette: dark enough to read on
+            // every paper colour, and it survives the Lock Screen's flattening
+            // because links are underlined too.
+            linkInk: Color(red: 0.15, green: 0.25, blue: 0.62)
         )
     }
 
@@ -58,20 +63,31 @@ struct MarkdownBodyView: View {
     private func view(for block: MarkdownBlock) -> some View {
         switch block {
         case .heading(let level, let text):
-            Text(MarkdownInline.attributed(text))
-                .font(.system(size: style.headingSize(level: level), weight: level <= 2 ? .bold : .semibold))
-                .frame(maxWidth: .infinity, alignment: .leading)
+            MarkdownInline.text(
+                text,
+                size: style.headingSize(level: level),
+                weight: level <= 2 ? .bold : .semibold,
+                theme: style
+            )
+            .frame(maxWidth: .infinity, alignment: .leading)
 
         case .paragraph(let text):
-            Text(MarkdownInline.attributed(text))
-                .font(.system(size: style.baseSize))
+            MarkdownInline.text(text, size: style.baseSize, theme: style)
                 .frame(maxWidth: .infinity, alignment: .leading)
 
         case .bullet(let text, let depth):
-            listRow(marker: Text("•").font(.system(size: style.baseSize, weight: .bold)), text: text, depth: depth)
+            listRow(
+                marker: Text(verbatim: "•").font(.system(size: style.baseSize, weight: .bold)),
+                text: text,
+                depth: depth
+            )
 
         case .numbered(let number, let text, let depth):
-            listRow(marker: Text("\(number).").font(.system(size: style.baseSize * 0.92, weight: .semibold)), text: text, depth: depth)
+            listRow(
+                marker: Text(verbatim: "\(number).").font(.system(size: style.baseSize * 0.92, weight: .semibold)),
+                text: text,
+                depth: depth
+            )
 
         case .task(let text, let isDone, let depth):
             listRow(
@@ -87,14 +103,13 @@ struct MarkdownBodyView: View {
                 RoundedRectangle(cornerRadius: 1, style: .continuous)
                     .fill(style.secondaryInk.opacity(0.55))
                     .frame(width: max(2, style.baseSize * 0.14))
-                Text(MarkdownInline.attributed(text))
-                    .font(.system(size: style.baseSize).italic())
+                MarkdownInline.text(text, size: style.baseSize, italic: true, theme: style)
                     .foregroundStyle(style.secondaryInk)
             }
             .fixedSize(horizontal: false, vertical: true)
 
         case .code(let text):
-            Text(text)
+            Text(verbatim: text)
                 .font(.system(size: style.baseSize * 0.88, design: .monospaced))
                 .padding(.horizontal, style.baseSize * 0.4)
                 .padding(.vertical, style.baseSize * 0.28)
@@ -115,26 +130,12 @@ struct MarkdownBodyView: View {
     private func listRow(marker: Text, text: String, depth: Int, strikethrough: Bool = false) -> some View {
         HStack(alignment: .firstTextBaseline, spacing: style.baseSize * 0.35) {
             marker.foregroundStyle(style.secondaryInk)
-            Text(MarkdownInline.attributed(text))
-                .font(.system(size: style.baseSize))
+            MarkdownInline.text(text, size: style.baseSize, theme: style)
                 .strikethrough(strikethrough, color: style.secondaryInk)
                 .foregroundStyle(strikethrough ? style.secondaryInk : style.ink)
                 .frame(maxWidth: .infinity, alignment: .leading)
         }
         .padding(.leading, style.indent(depth: depth))
         .fixedSize(horizontal: false, vertical: true)
-    }
-}
-
-enum MarkdownInline {
-    /// Inline-only markdown, so block syntax the parser already consumed can't
-    /// be re-interpreted (and so a stray `#` stays a `#`).
-    static func attributed(_ text: String) -> AttributedString {
-        let options = AttributedString.MarkdownParsingOptions(
-            allowsExtendedAttributes: false,
-            interpretedSyntax: .inlineOnlyPreservingWhitespace,
-            failurePolicy: .returnPartiallyParsedIfPossible
-        )
-        return (try? AttributedString(markdown: text, options: options)) ?? AttributedString(text)
     }
 }

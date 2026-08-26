@@ -77,11 +77,11 @@ struct WelcomeView: View {
 
     private var stickyStack: some View {
         ZStack {
-            StickyCard(note: sampleNotes[1], presentation: .editorPreview)
+            StickyCard(note: sampleNotes[1], presentation: .sample)
                 .frame(width: 150, height: 150)
                 .rotationEffect(.degrees(-8))
                 .offset(x: -58, y: 6)
-            StickyCard(note: sampleNotes[0], presentation: .editorPreview)
+            StickyCard(note: sampleNotes[0], presentation: .sample)
                 .frame(width: 160, height: 160)
                 .rotationEffect(.degrees(5))
                 .offset(x: 52, y: -4)

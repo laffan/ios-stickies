@@ -18,6 +18,7 @@
 		41A9AAA97DAEFED63835AADB /* DoubleStickyWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = F48E0907F6266F1A3FEC9DAD /* DoubleStickyWidget.swift */; };
 		42A190C91AF01CD021F4C056 /* MarkdownBodyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1CB83A4CD3FBC5421D408ECD /* MarkdownBodyView.swift */; };
 		488F4A4055DC0085EAA4292E /* StickyLibrary.swift in Sources */ = {isa = PBXBuildFile; fileRef = B7DE86A287BAC41C3B1FCEB0 /* StickyLibrary.swift */; };
+		4B647ED885154181E3FCA6A7 /* MarkdownInline.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAFE61466CC616802F4AE5A7 /* MarkdownInline.swift */; };
 		520314879331E6A1F01553FF /* NoteFileIO.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27DACC4F685C3B0B529C3759 /* NoteFileIO.swift */; };
 		5B5D20085A38EE9EE2307634 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10EAB708A76085AA4426150C /* SettingsView.swift */; };
 		615AEED1408DADE38C39F875 /* AppGroup.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E85CD6BE4C5ED4FB335A8F9 /* AppGroup.swift */; };
@@ -26,6 +27,7 @@
 		6FB6B2B21B84F75DF89E3505 /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3BF032146932C9BF9CBEBA73 /* RootView.swift */; };
 		72CECADAA0B1DCF6AF167B64 /* StickyViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 942CB8D72561886050C1087C /* StickyViews.swift */; };
 		77DD7675C057880F67E963F2 /* LockScreenStickyWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = C58487C85AAB391E45E6F8D8 /* LockScreenStickyWidget.swift */; };
+		79048120EE1E6E9E0444B05F /* MarkdownInline.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAFE61466CC616802F4AE5A7 /* MarkdownInline.swift */; };
 		794E0268BB90364535E82FB0 /* SingleStickyWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = BAA4E183F02118052B1F95CB /* SingleStickyWidget.swift */; };
 		83BE19931FA6807F9EC1B305 /* Note.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BE5EB937CBD4FEDB4746AFA /* Note.swift */; };
 		8A993134DB03D98681DF596C /* WidgetSnapshotStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8670B135F7F4CAF9A8C2100 /* WidgetSnapshotStore.swift */; };
@@ -143,6 +145,7 @@
 		C58487C85AAB391E45E6F8D8 /* LockScreenStickyWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = LockScreenStickyWidget.swift; path = LockScreenStickyWidget.swift; sourceTree = "<group>"; };
 		C8670B135F7F4CAF9A8C2100 /* WidgetSnapshotStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = WidgetSnapshotStore.swift; path = WidgetSnapshotStore.swift; sourceTree = "<group>"; };
 		C99BB6A05FED6BC1ACB96786 /* NoteEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = NoteEditorView.swift; path = NoteEditorView.swift; sourceTree = "<group>"; };
+		CAFE61466CC616802F4AE5A7 /* MarkdownInline.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = MarkdownInline.swift; path = MarkdownInline.swift; sourceTree = "<group>"; };
 		D171A8D286D5CAACE241E3CE /* MarkdownParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = MarkdownParser.swift; path = MarkdownParser.swift; sourceTree = "<group>"; };
 		DC16309B0B9B22DD9F3266DE /* StickiesWidgets.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = StickiesWidgets.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		E8C68CE4D508DF3E45F78974 /* NoteStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = NoteStore.swift; path = NoteStore.swift; sourceTree = "<group>"; };
@@ -189,6 +192,7 @@
 			isa = PBXGroup;
 			children = (
 				1CB83A4CD3FBC5421D408ECD /* MarkdownBodyView.swift */,
+				CAFE61466CC616802F4AE5A7 /* MarkdownInline.swift */,
 				D171A8D286D5CAACE241E3CE /* MarkdownParser.swift */,
 			);
 			path = Markdown;
@@ -352,6 +356,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				42A190C91AF01CD021F4C056 /* MarkdownBodyView.swift */,
+				4B647ED885154181E3FCA6A7 /* MarkdownInline.swift */,
 				D60DBDE042D801C7E66FAC79 /* MarkdownParser.swift */,
 				E4C400BFD73B2B1F576F0627 /* Note.swift */,
 				8BBB2D6FFD36BFE812A95F03 /* NoteFile.swift */,
@@ -378,6 +383,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				9EFD2E65B8889621BD1994C7 /* MarkdownBodyView.swift */,
+				79048120EE1E6E9E0444B05F /* MarkdownInline.swift */,
 				CF7B1457014330CF9493B522 /* MarkdownParser.swift */,
 				83BE19931FA6807F9EC1B305 /* Note.swift */,
 				A8B16A397822B58C786D7A5C /* NoteFile.swift */,

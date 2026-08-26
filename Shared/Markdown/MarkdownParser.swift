@@ -210,12 +210,6 @@ enum MarkdownPlainText {
     static func line(_ text: String) -> String {
         var result = text.trimmingCharacters(in: .whitespaces)
 
-        // Links and images: keep the label, drop the destination.
-        result = result.replacingOccurrences(
-            of: "!?\\[([^\\]]*)\\]\\([^)]*\\)",
-            with: "$1",
-            options: .regularExpression
-        )
         // Leading block syntax.
         result = result.replacingOccurrences(
             of: "^\\s*(#{1,6}\\s+|>\\s*|[-*+•]\\s+|\\d{1,3}[.)]\\s+)",
@@ -227,11 +221,9 @@ enum MarkdownPlainText {
             with: "",
             options: .regularExpression
         )
-        // Emphasis markers, kept simple on purpose: these run over user text
-        // in a widget, where a wrong-but-readable result beats a slow one.
-        for marker in ["***", "___", "**", "__", "~~", "*", "_", "`"] {
-            result = result.replacingOccurrences(of: marker, with: "")
-        }
-        return result.trimmingCharacters(in: .whitespaces)
+        // Inline syntax comes off via the same parser that renders it, so a
+        // title and its sticky always agree on where the words end — and
+        // snake_case survives, which blanket marker-stripping didn't manage.
+        return MarkdownInline.plain(result).trimmingCharacters(in: .whitespaces)
     }
 }

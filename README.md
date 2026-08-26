@@ -16,8 +16,13 @@ Screen, desktop or Lock Screen with a widget.
 - **Always in sync with the folder.** A directory watch catches local edits
   immediately; a background poll catches files that a cloud service
   materialises without an event. Nothing is cached as the source of truth.
-- **Markdown, rendered.** Headings, bold/italic, links, bullets, numbered
-  lists, task lists, quotes, code and rules — in the app *and* in the widgets.
+- **You write on the sticky.** The editor *is* the widget preview: one card at
+  widget proportions. Tap it to write markdown, tap away and it renders exactly
+  as the widget will.
+- **Markdown, rendered.** Headings, `**bold**`, `*italic*`, `~~strike~~`,
+  `` `code` ``, `[links](…)`, `<u>underline</u>`, bullets, numbered lists, task
+  lists, quotes and rules — in the app *and* in the widgets, from one parser
+  they both use.
 - **400 characters.** Enough for a real note, short enough to stay legible in
   a widget. Longer files that arrive from elsewhere are shown and flagged, not
   truncated.
@@ -163,7 +168,7 @@ Shared/                  Compiled into both the app and the widget extension
   Model/                 Note, sticky palette, the file format
   Storage/               Folder bookmark, coordinated file IO, folder watcher,
                          widget snapshot cache, the app's observable store
-  Markdown/              Block parser and its SwiftUI renderer
+  Markdown/              Block parser, inline parser, and their renderer
   UI/                    The sticky itself — used by widgets and by the app's
                          live preview, so they can't drift apart
 
@@ -174,6 +179,10 @@ Tools/                   Project and icon generators
 
 Two details worth knowing:
 
+- **One markdown renderer.** Inline emphasis is parsed into spans that carry
+  concrete fonts rather than `AttributedString` presentation intents, which a
+  `.font()` modifier downstream would flatten. Every sticky sets its own font
+  size, so spans are the only way the app and the widgets can agree.
 - **File access.** The folder is reached through a security-scoped bookmark
   stored in the App Group. Every read and write goes through `NSFileCoordinator`
   so a cloud provider writing from another device and the app reading take

@@ -18,14 +18,21 @@ struct StickyPresentation: Equatable {
     var scaledTitle: CGFloat { (titleSize * scale).rounded() }
     var scaledPadding: CGFloat { (padding * scale).rounded() }
 
+    /// The folded corner is sized from the type rather than the padding, so
+    /// widening the margins doesn't inflate the fold along with them.
+    var scaledFold: CGFloat { max(9, (baseFontSize * scale * 1.45).rounded()) }
+
+    // Widget margins are generous on purpose: the system rounds widget corners
+    // hard (more so since iOS 26), and text set tight to the edge gets clipped
+    // by the arc. These are the numbers to turn if a size feels off.
     static let widgetSmall = StickyPresentation(
-        baseFontSize: 12, titleSize: 14, padding: 13, cornerRadius: 0
+        baseFontSize: 12, titleSize: 14, padding: 22, cornerRadius: 0
     )
     static let widgetMedium = StickyPresentation(
-        baseFontSize: 13, titleSize: 16, padding: 15, cornerRadius: 0, showsFooter: true
+        baseFontSize: 13, titleSize: 16, padding: 28, cornerRadius: 0, showsFooter: true
     )
     static let widgetLarge = StickyPresentation(
-        baseFontSize: 14, titleSize: 19, padding: 18, cornerRadius: 0, showsFooter: true
+        baseFontSize: 14, titleSize: 19, padding: 32, cornerRadius: 0, showsFooter: true
     )
 
     /// One half of the stacked widget: same layout, smaller everything, and
@@ -34,7 +41,7 @@ struct StickyPresentation: Equatable {
         StickyPresentation(
             baseFontSize: 12,
             titleSize: 13,
-            padding: 11,
+            padding: 18,
             cornerRadius: cornerRadius,
             showsTitle: true,
             showsFooter: false,
@@ -43,8 +50,15 @@ struct StickyPresentation: Equatable {
         )
     }
 
-    static let editorPreview = StickyPresentation(
-        baseFontSize: 13, titleSize: 16, padding: 16, cornerRadius: 12, showsFooter: true
+    /// The surface the note is written on. Mirrors a large widget so what you
+    /// type is laid out the way the widget will lay it out.
+    static let editing = StickyPresentation(
+        baseFontSize: 15, titleSize: 20, padding: 30, cornerRadius: 18, showsFooter: true
+    )
+
+    /// Small decorative stickies — the ones on the welcome screen.
+    static let sample = StickyPresentation(
+        baseFontSize: 9, titleSize: 11, padding: 12, cornerRadius: 10
     )
 }
 
@@ -70,7 +84,23 @@ struct StickyPaper: View {
     }
 }
 
-/// The folded-over bottom corner.
+/// The folded-over bottom corner, paper and all.
+struct StickyFold: View {
+    let color: StickyColor
+    let size: CGFloat
+
+    var body: some View {
+        FoldedCorner(size: size)
+            .fill(color.fold)
+            .overlay(
+                FoldedCorner(size: size)
+                    .stroke(color.ink.opacity(0.08), lineWidth: 0.5)
+            )
+            .allowsHitTesting(false)
+    }
+}
+
+/// The triangle itself.
 struct FoldedCorner: Shape {
     var size: CGFloat
 
@@ -152,15 +182,9 @@ struct StickyContent: View {
                 endPoint: .bottom
             )
         )
-        .overlay(alignment: .bottomTrailing) {
+        .overlay {
             if presentation.showsFold {
-                FoldedCorner(size: presentation.scaledPadding * 1.15)
-                    .fill(note.color.fold)
-                    .overlay(
-                        FoldedCorner(size: presentation.scaledPadding * 1.15)
-                            .stroke(note.color.ink.opacity(0.08), lineWidth: 0.5)
-                    )
-                    .allowsHitTesting(false)
+                StickyFold(color: note.color, size: presentation.scaledFold)
             }
         }
     }
