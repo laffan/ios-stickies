@@ -45,20 +45,34 @@ struct LockScreenStickyView: View {
     }
 
     private func candidate(size: CGFloat, lineLimit: Int? = nil) -> some View {
-        VStack(alignment: .leading, spacing: 1) {
+        VStack(alignment: formatting.horizontal.stackAlignment, spacing: 1) {
             if showsTitle, !titleText.isEmpty {
                 Text(titleText)
-                    .font(.system(size: size + 1, weight: .semibold))
+                    .font(noteFont(size: size + 1, weight: formatting.bold ? .heavy : .semibold))
                     .lineLimit(1)
                     .widgetAccentable()
             }
             if !bodyText.isEmpty {
                 Text(bodyText)
-                    .font(.system(size: size))
+                    .font(noteFont(size: size, weight: formatting.bold ? .bold : .regular))
                     .lineLimit(lineLimit)
             }
         }
-        .frame(maxWidth: .infinity, alignment: .leading)
+        .underline(formatting.underline)
+        .multilineTextAlignment(formatting.horizontal.textAlignment)
+        .frame(maxWidth: .infinity, alignment: formatting.horizontal.frameAlignment)
+    }
+
+    /// The note's own emphasis carries over; its text size deliberately does
+    /// not, because the Lock Screen's whole job here is fitting the note into
+    /// a slot it can't grow.
+    private var formatting: NoteFormatting {
+        entry.note?.formatting ?? .standard
+    }
+
+    private func noteFont(size: CGFloat, weight: Font.Weight) -> Font {
+        let resolved = Font.system(size: size, weight: weight)
+        return formatting.italic ? resolved.italic() : resolved
     }
 
     // MARK: - Text

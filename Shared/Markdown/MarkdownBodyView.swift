@@ -11,20 +11,53 @@ struct MarkdownStyle: Equatable {
     var ink: Color
     var secondaryInk: Color
     var linkInk: Color
+    /// Emphasis the whole note carries, merged into every span on top of what
+    /// the markdown itself asks for.
+    var emphasis = InlineStyle()
+    var alignment: TextAlignment = .leading
 
-    static func sticky(color: StickyColor, baseSize: CGFloat, scale: CGFloat = 1) -> MarkdownStyle {
-        MarkdownStyle(
-            baseSize: (baseSize * scale).rounded(),
-            lineSpacing: (baseSize * scale * 0.18).rounded(),
-            blockSpacing: max(2, (baseSize * scale * 0.42).rounded()),
+    static func sticky(
+        color: StickyColor,
+        baseSize: CGFloat,
+        scale: CGFloat = 1,
+        formatting: NoteFormatting = .standard
+    ) -> MarkdownStyle {
+        let resolved = (baseSize * scale * formatting.textSize.scale).rounded()
+        return MarkdownStyle(
+            baseSize: resolved,
+            lineSpacing: (resolved * 0.18).rounded(),
+            blockSpacing: max(2, (resolved * 0.42).rounded()),
             ink: color.ink,
             secondaryInk: color.secondaryInk,
             // One deep navy across the whole palette: dark enough to read on
             // every paper colour, and it survives the Lock Screen's flattening
             // because links are underlined too.
-            linkInk: Color(red: 0.15, green: 0.25, blue: 0.62)
+            linkInk: Color(red: 0.15, green: 0.25, blue: 0.62),
+            emphasis: formatting.baseEmphasis,
+            alignment: formatting.horizontal.textAlignment
         )
     }
+
+    var frameAlignment: Alignment {
+        switch alignment {
+        case .leading: return .leading
+        case .center: return .center
+        case .trailing: return .trailing
+        }
+    }
+
+    var stackAlignment: HorizontalAlignment {
+        switch alignment {
+        case .leading: return .leading
+        case .center: return .center
+        case .trailing: return .trailing
+        }
+    }
+
+    /// Left-aligned rows fill the width so their text wraps against the
+    /// margin; centred and right-aligned ones shrink to their content, which
+    /// is what puts a bullet next to its own words rather than out at the edge.
+    var rowsFillWidth: Bool { alignment == .leading }
 
     /// Heading sizes, largest first. Deliberately restrained: inside a small
     /// widget an `# H1` at 2× swallows the whole note.
@@ -48,15 +81,15 @@ struct MarkdownBodyView: View {
     private var blocks: [MarkdownBlock] { MarkdownParser.parse(markdown) }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: style.blockSpacing) {
+        VStack(alignment: style.stackAlignment, spacing: style.blockSpacing) {
             ForEach(Array(blocks.enumerated()), id: \.offset) { _, block in
                 view(for: block)
             }
         }
         .lineSpacing(style.lineSpacing)
         .foregroundStyle(style.ink)
-        .multilineTextAlignment(.leading)
-        .frame(maxWidth: .infinity, alignment: .leading)
+        .multilineTextAlignment(style.alignment)
+        .frame(maxWidth: .infinity, alignment: style.frameAlignment)
     }
 
     @ViewBuilder
@@ -69,11 +102,11 @@ struct MarkdownBodyView: View {
                 weight: level <= 2 ? .bold : .semibold,
                 theme: style
             )
-            .frame(maxWidth: .infinity, alignment: .leading)
+            .frame(maxWidth: .infinity, alignment: style.frameAlignment)
 
         case .paragraph(let text):
             MarkdownInline.text(text, size: style.baseSize, theme: style)
-                .frame(maxWidth: .infinity, alignment: .leading)
+                .frame(maxWidth: .infinity, alignment: style.frameAlignment)
 
         case .bullet(let text, let depth):
             listRow(
@@ -106,6 +139,7 @@ struct MarkdownBodyView: View {
                 MarkdownInline.text(text, size: style.baseSize, italic: true, theme: style)
                     .foregroundStyle(style.secondaryInk)
             }
+            .frame(maxWidth: .infinity, alignment: style.frameAlignment)
             .fixedSize(horizontal: false, vertical: true)
 
         case .code(let text):
@@ -133,9 +167,10 @@ struct MarkdownBodyView: View {
             MarkdownInline.text(text, size: style.baseSize, theme: style)
                 .strikethrough(strikethrough, color: style.secondaryInk)
                 .foregroundStyle(strikethrough ? style.secondaryInk : style.ink)
-                .frame(maxWidth: .infinity, alignment: .leading)
+                .frame(maxWidth: style.rowsFillWidth ? CGFloat.infinity : nil, alignment: .leading)
         }
         .padding(.leading, style.indent(depth: depth))
+        .frame(maxWidth: .infinity, alignment: style.frameAlignment)
         .fixedSize(horizontal: false, vertical: true)
     }
 }

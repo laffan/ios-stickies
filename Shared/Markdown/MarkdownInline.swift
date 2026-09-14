@@ -63,11 +63,15 @@ enum MarkdownInline {
         theme: MarkdownStyle
     ) -> Text {
         let inline = span.style
-        let resolvedWeight: Font.Weight = inline.bold ? .bold : weight
+        // The note's own formatting is the floor: `**bold**` inside a note set
+        // in bold is still bold, and a note set in italic italicises the runs
+        // markdown left plain.
+        let base = theme.emphasis
+        let resolvedWeight: Font.Weight = (inline.bold || base.bold) ? .bold : weight
         var font: Font = inline.code
             ? .system(size: size * 0.92, weight: resolvedWeight, design: .monospaced)
             : .system(size: size, weight: resolvedWeight)
-        if inline.italic || italic {
+        if inline.italic || italic || base.italic {
             font = font.italic()
         }
 
@@ -76,7 +80,7 @@ enum MarkdownInline {
             text = text.strikethrough(true, color: theme.secondaryInk)
         }
         let isLink = inline.link != nil
-        if inline.underline || isLink {
+        if inline.underline || base.underline || isLink {
             text = text.underline(true, color: isLink ? theme.linkInk : theme.ink)
         }
         if isLink {

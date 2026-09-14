@@ -27,10 +27,47 @@ enum NoteFile {
         return formatter
     }()
 
+    /// A countdown's target is a date a human is likely to type by hand, so it
+    /// is written with the local offset — `2026-12-25T09:00:00+01:00` — and
+    /// read back from any of the shapes below.
+    private static let localDateFormatter: ISO8601DateFormatter = {
+        let formatter = ISO8601DateFormatter()
+        formatter.formatOptions = [.withInternetDateTime]
+        formatter.timeZone = TimeZone.current
+        return formatter
+    }()
+
+    private static let looseDateFormats = [
+        "yyyy-MM-dd'T'HH:mm:ss",
+        "yyyy-MM-dd'T'HH:mm",
+        "yyyy-MM-dd HH:mm:ss",
+        "yyyy-MM-dd HH:mm",
+        "yyyy-MM-dd",
+        "yyyy/MM/dd"
+    ]
+
+    /// Parse a date written in front matter, from strict ISO 8601 down to a
+    /// bare `2026-12-25` typed into the file by hand.
+    static func date(from raw: String) -> Date? {
+        let trimmed = raw.trimmingCharacters(in: .whitespaces)
+        guard !trimmed.isEmpty else { return nil }
+        if let iso = dateFormatter.date(from: trimmed) { return iso }
+        for format in looseDateFormats {
+            let formatter = DateFormatter()
+            formatter.locale = Locale(identifier: "en_US_POSIX")
+            formatter.timeZone = TimeZone.current
+            formatter.dateFormat = format
+            if let parsed = formatter.date(from: trimmed) { return parsed }
+        }
+        return nil
+    }
+
     struct Parsed {
         var body: String
         var color: StickyColor?
         var created: Date?
+        var formatting: NoteFormatting
+        var countdown: CountdownSettings
         var passthrough: [String]
     }
 
@@ -44,11 +81,20 @@ enum NoteFile {
               first.trimmingCharacters(in: .whitespaces) == delimiter,
               let closing = closingDelimiterIndex(in: lines)
         else {
-            return Parsed(body: trimTrailingNewlines(normalized), color: nil, created: nil, passthrough: [])
+            return Parsed(
+                body: trimTrailingNewlines(normalized),
+                color: nil,
+                created: nil,
+                formatting: .standard,
+                countdown: CountdownSettings(),
+                passthrough: []
+            )
         }
 
         var color: StickyColor?
         var created: Date?
+        var formatting = NoteFormatting.standard
+        var countdown = CountdownSettings()
         var passthrough: [String] = []
 
         for line in lines[1..<closing] {
@@ -60,14 +106,41 @@ enum NoteFile {
             }
             let key = trimmed[trimmed.startIndex..<separator].trimmingCharacters(in: .whitespaces).lowercased()
             let value = trimmed[trimmed.index(after: separator)...].trimmingCharacters(in: .whitespaces)
+            // A key we recognise but can't make sense of is kept verbatim
+            // rather than dropped: the note keeps whatever another tool wrote,
+            // and the app just carries on with its default.
+            var understood = true
             switch key {
             case "color", "colour":
                 color = StickyColor.named(value)
             case "created":
                 created = dateFormatter.date(from: value)
+            case "size", "text-size", "textsize", "font-size":
+                if let size = NoteTextSize.named(value) { formatting.textSize = size }
+                else { understood = false }
+            case "align", "alignment", "text-align":
+                if let aligned = NoteHorizontalAlignment.named(value) { formatting.horizontal = aligned }
+                else { understood = false }
+            case "valign", "vertical-align", "vertical-alignment":
+                if let aligned = NoteVerticalAlignment.named(value) { formatting.vertical = aligned }
+                else { understood = false }
+            case "style", "emphasis":
+                understood = formatting.applyStyleList(value)
+            case "countdown", "countdown-to", "countdown-date":
+                if let target = date(from: value) { countdown.target = target }
+                else { understood = false }
+            case "countdown-units", "countdown-fields":
+                let units = value
+                    .components(separatedBy: CharacterSet(charactersIn: ", \t"))
+                    .compactMap { CountdownUnit.named($0) }
+                if units.isEmpty { understood = false } else { countdown.units = units }
+            case "countdown-style", "countdown-format":
+                if let style = CountdownStyle.named(value) { countdown.style = style }
+                else { understood = false }
             default:
-                passthrough.append(trimmed)
+                understood = false
             }
+            if !understood { passthrough.append(trimmed) }
         }
 
         lines.removeSubrange(0...closing)
@@ -78,6 +151,8 @@ enum NoteFile {
             body: trimTrailingNewlines(lines.joined(separator: "\n")),
             color: color,
             created: created,
+            formatting: formatting,
+            countdown: countdown,
             passthrough: passthrough
         )
     }
@@ -110,15 +185,35 @@ enum NoteFile {
     // MARK: - Writing
 
     /// Serialize a note back to markdown, preserving unknown front-matter keys.
+    ///
+    /// Only settings that differ from the defaults are written, so a note
+    /// nobody has restyled stays as plain on disk as it was before the app
+    /// grew formatting at all.
     static func serialize(_ note: Note) -> String {
         var lines = [delimiter]
         lines.append("color: \(note.color.token)")
         lines.append("created: \(dateFormatter.string(from: note.created))")
+        lines.append(contentsOf: note.formatting.frontMatterLines)
+        lines.append(contentsOf: countdownLines(for: note.countdown))
         lines.append(contentsOf: note.passthroughFrontMatter)
         lines.append(delimiter)
         lines.append("")
         lines.append(note.body)
         return lines.joined(separator: "\n") + "\n"
+    }
+
+    /// Nothing is written for a note with no countdown — the units on their
+    /// own would be metadata about a clock that doesn't exist.
+    private static func countdownLines(for countdown: CountdownSettings) -> [String] {
+        guard let target = countdown.target else { return [] }
+        var lines = ["countdown: \(localDateFormatter.string(from: target))"]
+        if countdown.orderedUnits != CountdownSettings.defaultUnits {
+            lines.append("countdown-units: \(countdown.orderedUnits.map(\.rawValue).joined(separator: ", "))")
+        }
+        if countdown.style != .full {
+            lines.append("countdown-style: \(countdown.style.token)")
+        }
+        return lines
     }
 
     // MARK: - File names

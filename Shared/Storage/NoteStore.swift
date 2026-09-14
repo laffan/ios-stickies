@@ -211,8 +211,17 @@ final class NoteStore {
 
     /// Persist an edit. Returns the note as it now exists on disk, since the
     /// file may have been renamed to match a newly typed title.
+    ///
+    /// `formatting` and `countdown` left nil mean "as they are" — the colour
+    /// menu in the sidebar has no opinion about either.
     @discardableResult
-    func save(_ note: Note, body: String, color: StickyColor) -> Note? {
+    func save(
+        _ note: Note,
+        body: String,
+        color: StickyColor,
+        formatting: NoteFormatting? = nil,
+        countdown: CountdownSettings? = nil
+    ) -> Note? {
         guard let scope = FolderAccess.resolve() else {
             lastError = NoteFileIO.IOError.folderUnavailable.localizedDescription
             return nil
@@ -222,6 +231,8 @@ final class NoteStore {
             var updated = note
             updated.body = body
             updated.color = color
+            if let formatting { updated.formatting = formatting }
+            if let countdown { updated.countdown = countdown }
             updated.modified = Date()
 
             do {

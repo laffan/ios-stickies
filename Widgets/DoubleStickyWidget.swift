@@ -21,10 +21,30 @@ struct DoubleStickyProvider: AppIntentTimelineProvider {
     }
 
     func timeline(for configuration: SelectTwoStickiesIntent, in context: Context) async -> Timeline<DoubleStickyEntry> {
-        Timeline(entries: [entry(for: configuration)], policy: .after(StickyResolver.nextRefresh()))
+        let state = StickyLibrary.current()
+        let resolved = StickyResolver.resolvePair(
+            topID: configuration.topNote?.id,
+            bottomID: configuration.bottomNote?.id,
+            in: state
+        )
+        // Either sticky can be counting down; the faster one sets the pace.
+        let dates = StickyResolver.entryDates(for: [resolved.top, resolved.bottom].compactMap { $0 })
+        let entries = dates.map { date in
+            DoubleStickyEntry(
+                date: date,
+                topNote: resolved.top?.resolved(at: date),
+                bottomNote: resolved.bottom?.resolved(at: date),
+                status: resolved.status,
+                showsTitles: configuration.showsTitles
+            )
+        }
+        return Timeline(
+            entries: entries,
+            policy: entries.count > 1 ? .atEnd : .after(StickyResolver.nextRefresh())
+        )
     }
 
-    private func entry(for configuration: SelectTwoStickiesIntent) -> DoubleStickyEntry {
+    private func entry(for configuration: SelectTwoStickiesIntent, at date: Date = Date()) -> DoubleStickyEntry {
         let state = StickyLibrary.current()
         let resolved = StickyResolver.resolvePair(
             topID: configuration.topNote?.id,
@@ -32,9 +52,9 @@ struct DoubleStickyProvider: AppIntentTimelineProvider {
             in: state
         )
         return DoubleStickyEntry(
-            date: Date(),
-            topNote: resolved.top,
-            bottomNote: resolved.bottom,
+            date: date,
+            topNote: resolved.top?.resolved(at: date),
+            bottomNote: resolved.bottom?.resolved(at: date),
             status: resolved.status,
             showsTitles: configuration.showsTitles
         )

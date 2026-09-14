@@ -13,9 +13,13 @@ struct StickyPresentation: Equatable {
     /// Multiplies every size. This is the single knob the stacked widget
     /// turns to get its smaller text.
     var scale: CGFloat = 1
+    /// The note's own text size. Kept apart from `scale` because it must not
+    /// touch the margins: a note set in extra large still needs the same gap
+    /// to the widget's rounded edge.
+    var textScale: CGFloat = 1
 
-    var scaledBase: CGFloat { (baseFontSize * scale).rounded() }
-    var scaledTitle: CGFloat { (titleSize * scale).rounded() }
+    var scaledBase: CGFloat { (baseFontSize * scale * textScale).rounded() }
+    var scaledTitle: CGFloat { (titleSize * scale * textScale).rounded() }
     var scaledPadding: CGFloat { (padding * scale).rounded() }
 
     /// The folded corner is sized from the type rather than the padding, so
@@ -49,12 +53,6 @@ struct StickyPresentation: Equatable {
             scale: scale
         )
     }
-
-    /// The surface the note is written on. Mirrors a large widget so what you
-    /// type is laid out the way the widget will lay it out.
-    static let editing = StickyPresentation(
-        baseFontSize: 15, titleSize: 20, padding: 30, cornerRadius: 18, showsFooter: true
-    )
 
     /// Small decorative stickies — the ones on the welcome screen.
     static let sample = StickyPresentation(
@@ -122,6 +120,15 @@ struct StickyContent: View {
     let note: Note
     var presentation: StickyPresentation
 
+    private var formatting: NoteFormatting { note.formatting }
+
+    /// The presentation with the note's own text size folded in.
+    private var sized: StickyPresentation {
+        var sized = presentation
+        sized.textScale = presentation.textScale * formatting.textSize.scale
+        return sized
+    }
+
     /// A note that opens with a list has no title line of its own, so the
     /// heading row is given back to the content instead of repeating the file
     /// name above it.
@@ -137,38 +144,46 @@ struct StickyContent: View {
         MarkdownStyle.sticky(
             color: note.color,
             baseSize: presentation.baseFontSize,
-            scale: presentation.scale
+            scale: presentation.scale * presentation.textScale,
+            formatting: formatting
         )
     }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: presentation.scaledBase * 0.4) {
+        VStack(alignment: formatting.horizontal.stackAlignment, spacing: sized.scaledBase * 0.4) {
+            // Vertical centring is two spacers rather than a frame alignment,
+            // so the footer can still sit on the bottom edge where it belongs.
+            if formatting.vertical.padsAbove { Spacer(minLength: 0) }
+
             if showsTitle {
-                Text(note.title)
-                    .font(.system(size: presentation.scaledTitle, weight: .semibold))
+                titleText
                     .foregroundStyle(note.color.ink)
                     .lineLimit(2)
+                    .multilineTextAlignment(formatting.horizontal.textAlignment)
+                    .frame(maxWidth: .infinity, alignment: formatting.horizontal.frameAlignment)
                     .fixedSize(horizontal: false, vertical: true)
             }
 
             if note.isEmpty {
                 Text("Empty note")
-                    .font(.system(size: presentation.scaledBase).italic())
+                    .font(.system(size: sized.scaledBase).italic())
                     .foregroundStyle(note.color.secondaryInk)
+                    .frame(maxWidth: .infinity, alignment: formatting.horizontal.frameAlignment)
             } else if !bodyMarkdown.isEmpty {
                 MarkdownBodyView(markdown: bodyMarkdown, style: markdownStyle)
             }
 
-            Spacer(minLength: 0)
+            if formatting.vertical.padsBelow { Spacer(minLength: 0) }
 
             if presentation.showsFooter {
                 Text(note.modified, format: .dateTime.month(.abbreviated).day().hour().minute())
-                    .font(.system(size: max(8, presentation.scaledBase * 0.72), weight: .medium))
+                    .font(.system(size: max(8, sized.scaledBase * 0.72), weight: .medium))
                     .foregroundStyle(note.color.secondaryInk)
+                    .frame(maxWidth: .infinity, alignment: formatting.horizontal.frameAlignment)
             }
         }
-        .padding(presentation.scaledPadding)
-        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+        .padding(sized.scaledPadding)
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: formatting.horizontal.frameAlignment)
         // Long notes simply run out of room; fading the last few points is
         // kinder than a hard cut mid-letter.
         .mask(
@@ -187,6 +202,24 @@ struct StickyContent: View {
                 StickyFold(color: note.color, size: presentation.scaledFold)
             }
         }
+    }
+
+    /// The title carries the note's own emphasis too — it's the same sentence
+    /// as the rest of the sticky, just set larger. The font is resolved here
+    /// rather than left to a `.font()` downstream, for the same reason the
+    /// markdown renderer resolves its own: a modifier applied later would
+    /// flatten it.
+    private var titleFont: Font {
+        let font = Font.system(
+            size: sized.scaledTitle,
+            weight: formatting.bold ? .heavy : .semibold
+        )
+        return formatting.italic ? font.italic() : font
+    }
+
+    private var titleText: Text {
+        let text = Text(note.title).font(titleFont)
+        return formatting.underline ? text.underline(true, color: note.color.ink) : text
     }
 }
 

@@ -28,7 +28,13 @@ struct NoteEntity: AppEntity, Identifiable, Hashable {
     }
 
     init(note: Note) {
-        self.init(id: note.id, title: note.title, colorName: note.color.displayName)
+        // The picker shows the note as it reads now, countdown and all, while
+        // the id stays the file name the widget will store.
+        self.init(
+            id: note.id,
+            title: note.resolved(at: Date()).title,
+            colorName: note.color.displayName
+        )
     }
 }
 

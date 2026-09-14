@@ -22,15 +22,32 @@ struct SingleStickyProvider: AppIntentTimelineProvider {
     }
 
     func timeline(for configuration: SelectStickyIntent, in context: Context) async -> Timeline<SingleStickyEntry> {
-        Timeline(entries: [entry(for: configuration)], policy: .after(StickyResolver.nextRefresh()))
+        let state = StickyLibrary.current()
+        let resolved = StickyResolver.resolve(id: configuration.note?.id, in: state)
+        let dates = StickyResolver.entryDates(for: [resolved.note].compactMap { $0 })
+        let entries = dates.map { date in
+            SingleStickyEntry(
+                date: date,
+                // Each entry carries the note as it reads at that moment, so
+                // a `{{countdown}}` counts down without the extension waking.
+                note: resolved.note?.resolved(at: date),
+                status: resolved.status,
+                showsTitle: configuration.showsTitle,
+                showsFooter: configuration.showsFooter
+            )
+        }
+        return Timeline(
+            entries: entries,
+            policy: entries.count > 1 ? .atEnd : .after(StickyResolver.nextRefresh())
+        )
     }
 
-    private func entry(for configuration: SelectStickyIntent) -> SingleStickyEntry {
+    private func entry(for configuration: SelectStickyIntent, at date: Date = Date()) -> SingleStickyEntry {
         let state = StickyLibrary.current()
         let resolved = StickyResolver.resolve(id: configuration.note?.id, in: state)
         return SingleStickyEntry(
-            date: Date(),
-            note: resolved.note,
+            date: date,
+            note: resolved.note?.resolved(at: date),
             status: resolved.status,
             showsTitle: configuration.showsTitle,
             showsFooter: configuration.showsFooter
