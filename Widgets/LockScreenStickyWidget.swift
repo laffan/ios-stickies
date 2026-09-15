@@ -48,31 +48,26 @@ struct LockScreenStickyView: View {
         VStack(alignment: formatting.horizontal.stackAlignment, spacing: 1) {
             if showsTitle, !titleText.isEmpty {
                 Text(titleText)
-                    .font(noteFont(size: size + 1, weight: formatting.bold ? .heavy : .semibold))
+                    .font(.system(size: size + 1, weight: .semibold))
                     .lineLimit(1)
                     .widgetAccentable()
             }
             if !bodyText.isEmpty {
                 Text(bodyText)
-                    .font(noteFont(size: size, weight: formatting.bold ? .bold : .regular))
+                    .font(.system(size: size))
                     .lineLimit(lineLimit)
             }
         }
-        .underline(formatting.underline)
         .multilineTextAlignment(formatting.horizontal.textAlignment)
         .frame(maxWidth: .infinity, alignment: formatting.horizontal.frameAlignment)
     }
 
-    /// The note's own emphasis carries over; its text size deliberately does
-    /// not, because the Lock Screen's whole job here is fitting the note into
-    /// a slot it can't grow.
+    /// Only the note's alignment carries over. Its text size doesn't, because
+    /// fitting the note into a slot it can't grow is this widget's whole job,
+    /// and its emphasis doesn't either: the system draws this in one tint, on
+    /// a flattened string with no markdown left in it.
     private var formatting: NoteFormatting {
         entry.note?.formatting ?? .standard
-    }
-
-    private func noteFont(size: CGFloat, weight: Font.Weight) -> Font {
-        let resolved = Font.system(size: size, weight: weight)
-        return formatting.italic ? resolved.italic() : resolved
     }
 
     // MARK: - Text

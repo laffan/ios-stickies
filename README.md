@@ -24,11 +24,16 @@ Screen, desktop or Lock Screen with a widget.
 - **Markdown, rendered.** Headings, `**bold**`, `*italic*`, `~~strike~~`,
   `` `code` ``, `[links](…)`, `<u>underline</u>`, bullets, numbered lists, task
   lists, quotes and rules — in the app *and* in the widgets, from one parser
-  they both use.
-- **Per-note formatting.** Text size, horizontal and vertical alignment, and
-  bold / italic / underline across the whole note — the settings markdown has
-  no syntax for. They're stored in the file, so the widget sets the note
-  exactly the way the editor did.
+  they both use, on the title line as much as anywhere else. The syntax is
+  listed under the editor so there's no guessing at what's supported.
+- **Per-note formatting.** Text size, horizontal and vertical alignment, and a
+  coloured border — the settings markdown has no syntax for. (Emphasis isn't
+  one of them: `**bold**` marks the words that are bold, including on the
+  title line.) They're stored in the file, so the widget sets the note exactly
+  the way the editor did.
+- **Fit to widget.** One of the text sizes isn't a size: **Fit** sets the note
+  as large as it goes while every word still shows, worked out per widget, so
+  *3 DAYS LEFT* fills a small widget the way it should.
 - **A countdown, in the sentence.** Give a note a date and write
   `{{countdown}}` wherever the time left belongs: *"Ship in {{countdown}}"*.
   Choose which fields it shows — months, weeks, days, hours, minutes, seconds —
@@ -48,7 +53,7 @@ Screen, desktop or Lock Screen with a widget.
 
 Each widget is configured by long-pressing it and choosing **Edit Widget**,
 then picking which sticky it should show. Everything else about how it looks —
-colour, text size, alignment, emphasis, any countdown — belongs to the note, so
+colour, text size, alignment, border, any countdown — belongs to the note, so
 changing it in the app changes every widget showing that note at once.
 
 The Lock Screen widget renders in the system's single-tint mode, so sticky
@@ -161,12 +166,15 @@ created: 2026-08-25T09:41:00Z
 - `color` — one of `yellow`, `pink`, `blue`, `green`, `orange`, `purple`.
   Missing? A colour is derived from the file name, stably.
 - `created` — ISO 8601. Missing? The file's creation date is used.
-- `size` — `x-small`, `small`, `medium`, `large`, `x-large`. It's a multiplier,
-  not a point size, so the same note still reads correctly at every widget size.
+- `size` — `x-small`, `small`, `medium`, `large`, `x-large`, `huge`, or `fit`.
+  It's a multiplier, not a point size, so the same note still reads correctly
+  at every widget size. `fit` has no size of its own: the note is set as large
+  as it can be while every word still shows.
 - `align` — `left`, `center`, `right`.
 - `valign` — `top`, `middle`, `bottom`. Where the text sits on the paper.
-- `style` — any of `bold`, `italic`, `underline`, comma separated. This is on
-  top of the note's markdown, never instead of it.
+- `border` — one of the six palette colours, or `none`. Drawn in a deeper shade
+  of that colour, so a pink border reads as pink on yellow paper.
+- `border-width` — `hairline`, `thin`, `medium` or `thick`.
 - `countdown` — the date `{{countdown}}` counts to. Written with the local
   offset; a bare `2026-12-25` typed in by hand is read too.
 - `countdown-units` — which fields show, from `years`, `months`, `weeks`,
@@ -235,14 +243,22 @@ Two details worth knowing:
 - **One markdown renderer.** Inline emphasis is parsed into spans that carry
   concrete fonts rather than `AttributedString` presentation intents, which a
   `.font()` modifier downstream would flatten. Every sticky sets its own font
-  size, so spans are the only way the app and the widgets can agree. A note's
-  own bold / italic / underline is merged into every span as it's resolved,
-  which is why *set the note in bold* and `**bold**` compose instead of
-  cancelling out.
+  size, so spans are the only way the app and the widgets can agree. The title
+  line goes through the same renderer, so `**bold**` in the first line of a
+  note is bold on the sticky — the flattened `title` is kept for file names,
+  window titles and the widget's picker, where syntax would only be noise.
 - **Previews are the widget, scaled.** A preview is laid out at the real
   widget's point size and then scaled as one piece, rather than being squeezed
   into a smaller box with the type left where it was. It has to be: the whole
   point of the preview is how much of the note fits.
+- **Fit is a ladder, not a calculation.** `ViewThatFits` is handed the note set
+  at ten sizes, largest first, and takes the first whose text fits the widget.
+  Measuring type is the layout system's job; asking it ten questions is far
+  more reliable than predicting where the lines will break.
+- **The border is a `ContainerRelativeShape`.** Inside a widget that adopts
+  whatever radius the system rounds the widget to — which changes between OS
+  versions and device sizes — and inside the app it adopts the card's own,
+  handed down by `.containerShape`. Nothing has to guess.
 - **File access.** The folder is reached through a security-scoped bookmark
   stored in the App Group. Every read and write goes through `NSFileCoordinator`
   so a cloud provider writing from another device and the app reading take
@@ -282,6 +298,10 @@ needs any third-party packages.
   minute-by-minute entries at a time. A countdown showing **seconds** is
   rendered but not ticked — WidgetKit won't wake anything that often, so on a
   widget it moves once a minute. In the app it moves every second.
-- The Lock Screen sticky keeps the note's emphasis and alignment but not its
-  text size: that widget's job is shrinking the note until it fits a slot it
-  can't grow.
+- The Lock Screen sticky keeps the note's alignment and nothing else: the
+  system draws it in one tint on a flattened string, so there's no markdown
+  left to emphasise and no border to colour, and its text size is already
+  decided by shrinking the note until it fits a slot it can't grow.
+- **Fit** measures height, not width. A single word longer than the widget is
+  wrapped across lines rather than shrunk to one — at that point the note is
+  asking for something the widget can't give it.

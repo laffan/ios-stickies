@@ -1,45 +1,36 @@
 import SwiftUI
 
-/// How one note's text is set.
+/// How one note is set: the things that apply to the sticky as a whole.
 ///
-/// This travels in the note's own front matter, which is what lets a widget
+/// Emphasis is deliberately *not* here. Bold, italic, underline and the rest
+/// belong to the words they're on, and markdown already says which words those
+/// are — `**bold**`, `*italic*`, `<u>underline</u>`. What's left is the stuff
+/// markdown has no syntax for: how big the type is, where it sits on the
+/// paper, and whether the sticky is framed.
+///
+/// It travels in the note's own front matter, which is what lets a widget
 /// render a sticky exactly the way the editor did: the widget reads the same
 /// file (or the same snapshot) and gets the same numbers.
-///
-/// Markdown still does the fine-grained work — `**bold**` on one word — and
-/// these are the note-wide settings that markdown has no syntax for.
 struct NoteFormatting: Hashable, Codable, Sendable {
     var textSize: NoteTextSize = .medium
     var horizontal: NoteHorizontalAlignment = .leading
     var vertical: NoteVerticalAlignment = .top
-    var bold = false
-    var italic = false
-    var underline = false
+    var border = NoteBorder()
 
     static let standard = NoteFormatting()
 
     var isStandard: Bool { self == NoteFormatting.standard }
 
-    /// Emphasis applied to every run of the note, on top of whatever the
-    /// markdown itself asks for.
-    var baseEmphasis: InlineStyle {
-        InlineStyle(bold: bold, italic: italic, underline: underline)
-    }
-
     init(
         textSize: NoteTextSize = .medium,
         horizontal: NoteHorizontalAlignment = .leading,
         vertical: NoteVerticalAlignment = .top,
-        bold: Bool = false,
-        italic: Bool = false,
-        underline: Bool = false
+        border: NoteBorder = NoteBorder()
     ) {
         self.textSize = textSize
         self.horizontal = horizontal
         self.vertical = vertical
-        self.bold = bold
-        self.italic = italic
-        self.underline = underline
+        self.border = border
     }
 
     /// Decoded a key at a time so a snapshot written by an older build — one
@@ -50,9 +41,7 @@ struct NoteFormatting: Hashable, Codable, Sendable {
         textSize = try container.decodeIfPresent(NoteTextSize.self, forKey: .textSize) ?? .medium
         horizontal = try container.decodeIfPresent(NoteHorizontalAlignment.self, forKey: .horizontal) ?? .leading
         vertical = try container.decodeIfPresent(NoteVerticalAlignment.self, forKey: .vertical) ?? .top
-        bold = try container.decodeIfPresent(Bool.self, forKey: .bold) ?? false
-        italic = try container.decodeIfPresent(Bool.self, forKey: .italic) ?? false
-        underline = try container.decodeIfPresent(Bool.self, forKey: .underline) ?? false
+        border = try container.decodeIfPresent(NoteBorder.self, forKey: .border) ?? NoteBorder()
     }
 }
 
@@ -67,16 +56,23 @@ enum NoteTextSize: String, CaseIterable, Codable, Sendable, Identifiable {
     case medium
     case large
     case extraLarge
+    case huge
+    /// No size of its own: the note is set as large as it can be while every
+    /// word still fits the widget. See `StickyContent`.
+    case fit
 
     var id: String { rawValue }
 
-    var scale: CGFloat {
+    /// Nil for `.fit`, which is decided at layout time rather than stored.
+    var scale: CGFloat? {
         switch self {
-        case .extraSmall: return 0.78
-        case .small: return 0.89
+        case .extraSmall: return 0.75
+        case .small: return 0.88
         case .medium: return 1.0
-        case .large: return 1.18
-        case .extraLarge: return 1.4
+        case .large: return 1.25
+        case .extraLarge: return 1.6
+        case .huge: return 2.2
+        case .fit: return nil
         }
     }
 
@@ -87,6 +83,8 @@ enum NoteTextSize: String, CaseIterable, Codable, Sendable, Identifiable {
         case .medium: return "Medium"
         case .large: return "Large"
         case .extraLarge: return "Extra Large"
+        case .huge: return "Huge"
+        case .fit: return "Fit to Widget"
         }
     }
 
@@ -98,6 +96,8 @@ enum NoteTextSize: String, CaseIterable, Codable, Sendable, Identifiable {
         case .medium: return "M"
         case .large: return "L"
         case .extraLarge: return "XL"
+        case .huge: return "2XL"
+        case .fit: return "Fit"
         }
     }
 
@@ -109,6 +109,8 @@ enum NoteTextSize: String, CaseIterable, Codable, Sendable, Identifiable {
         case .medium: return "medium"
         case .large: return "large"
         case .extraLarge: return "x-large"
+        case .huge: return "huge"
+        case .fit: return "fit"
         }
     }
 
@@ -123,8 +125,12 @@ enum NoteTextSize: String, CaseIterable, Codable, Sendable, Identifiable {
             return .medium
         case "large", "l", "big":
             return .large
-        case "x-large", "xlarge", "xl", "extra-large", "extralarge", "huge":
+        case "x-large", "xlarge", "xl", "extra-large", "extralarge":
             return .extraLarge
+        case "huge", "2xl", "xxl", "giant":
+            return .huge
+        case "fit", "auto", "fill":
+            return .fit
         default:
             return nil
         }
@@ -241,43 +247,77 @@ enum NoteVerticalAlignment: String, CaseIterable, Codable, Sendable, Identifiabl
     }
 }
 
+// MARK: - Border
+
+/// A frame around the sticky, in any of the palette's colours.
+///
+/// The border follows the *container's* corner radius rather than one of its
+/// own, so it hugs the widget's rounding on the Home Screen and the card's in
+/// the app — see `StickyContent`.
+struct NoteBorder: Hashable, Codable, Sendable {
+    /// Nil means no border, which is what a sticky has unless asked otherwise.
+    var color: StickyColor?
+    var width: NoteBorderWidth = .medium
+
+    init(color: StickyColor? = nil, width: NoteBorderWidth = .medium) {
+        self.color = color
+        self.width = width
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        color = try container.decodeIfPresent(StickyColor.self, forKey: .color)
+        width = try container.decodeIfPresent(NoteBorderWidth.self, forKey: .width) ?? .medium
+    }
+
+    var isVisible: Bool { color != nil }
+}
+
+enum NoteBorderWidth: String, CaseIterable, Codable, Sendable, Identifiable {
+    case hairline
+    case thin
+    case medium
+    case thick
+
+    var id: String { rawValue }
+
+    /// Points at a full-size widget; scaled down with everything else when the
+    /// sticky is drawn smaller.
+    var points: CGFloat {
+        switch self {
+        case .hairline: return 1.5
+        case .thin: return 3
+        case .medium: return 5
+        case .thick: return 9
+        }
+    }
+
+    var displayName: String {
+        switch self {
+        case .hairline: return "Hairline"
+        case .thin: return "Thin"
+        case .medium: return "Medium"
+        case .thick: return "Thick"
+        }
+    }
+
+    var token: String { rawValue }
+
+    static func named(_ raw: String?) -> NoteBorderWidth? {
+        guard let raw else { return nil }
+        switch raw.trimmingCharacters(in: .whitespaces).lowercased() {
+        case "hairline", "hair", "xs": return .hairline
+        case "thin", "s", "small": return .thin
+        case "medium", "m", "regular": return .medium
+        case "thick", "l", "large", "heavy": return .thick
+        default: return nil
+        }
+    }
+}
+
 // MARK: - Front matter
 
 extension NoteFormatting {
-    /// Parse a `style:` value — any of `bold`, `italic`, `underline`, in any
-    /// order, separated by commas or spaces.
-    /// Returns false when the value held nothing we understand, so the caller
-    /// can keep the line as written rather than dropping it.
-    @discardableResult
-    mutating func applyStyleList(_ raw: String) -> Bool {
-        var parsed = NoteFormatting.standard
-        var understood = false
-        for token in raw.lowercased().components(separatedBy: CharacterSet(charactersIn: ", \t")) {
-            switch token.trimmingCharacters(in: .whitespaces) {
-            case "": continue
-            case "bold", "b", "strong": parsed.bold = true
-            case "italic", "i", "italics", "em": parsed.italic = true
-            case "underline", "u", "underlined": parsed.underline = true
-            case "none", "plain", "regular", "normal": break
-            default: return false
-            }
-            understood = true
-        }
-        guard understood else { return false }
-        bold = parsed.bold
-        italic = parsed.italic
-        underline = parsed.underline
-        return true
-    }
-
-    var styleList: String {
-        var tokens: [String] = []
-        if bold { tokens.append("bold") }
-        if italic { tokens.append("italic") }
-        if underline { tokens.append("underline") }
-        return tokens.joined(separator: ", ")
-    }
-
     /// The front-matter lines this formatting needs. A note left at the
     /// defaults writes nothing at all, so files stay as plain as they started.
     var frontMatterLines: [String] {
@@ -285,7 +325,10 @@ extension NoteFormatting {
         if textSize != .medium { lines.append("size: \(textSize.token)") }
         if horizontal != .leading { lines.append("align: \(horizontal.token)") }
         if vertical != .top { lines.append("valign: \(vertical.token)") }
-        if bold || italic || underline { lines.append("style: \(styleList)") }
+        if let color = border.color {
+            lines.append("border: \(color.token)")
+            if border.width != .medium { lines.append("border-width: \(border.width.token)") }
+        }
         return lines
     }
 }

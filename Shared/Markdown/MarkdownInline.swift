@@ -63,15 +63,13 @@ enum MarkdownInline {
         theme: MarkdownStyle
     ) -> Text {
         let inline = span.style
-        // The note's own formatting is the floor: `**bold**` inside a note set
-        // in bold is still bold, and a note set in italic italicises the runs
-        // markdown left plain.
-        let base = theme.emphasis
-        let resolvedWeight: Font.Weight = (inline.bold || base.bold) ? .bold : weight
+        // `**bold**` inside a heading has to out-weigh the heading's own
+        // semibold, or emphasis would disappear exactly where it's loudest.
+        let resolvedWeight: Font.Weight = inline.bold ? boldWeight(over: weight) : weight
         var font: Font = inline.code
             ? .system(size: size * 0.92, weight: resolvedWeight, design: .monospaced)
             : .system(size: size, weight: resolvedWeight)
-        if inline.italic || italic || base.italic {
+        if inline.italic || italic {
             font = font.italic()
         }
 
@@ -80,13 +78,21 @@ enum MarkdownInline {
             text = text.strikethrough(true, color: theme.secondaryInk)
         }
         let isLink = inline.link != nil
-        if inline.underline || base.underline || isLink {
+        if inline.underline || isLink {
             text = text.underline(true, color: isLink ? theme.linkInk : theme.ink)
         }
         if isLink {
             text = text.foregroundStyle(theme.linkInk)
         }
         return text
+    }
+
+    /// One step heavier than the run it sits in, so emphasis reads as emphasis
+    /// on a heading and on a title line, not just in a paragraph.
+    private static func boldWeight(over weight: Font.Weight) -> Font.Weight {
+        if weight == .heavy || weight == .black { return .black }
+        if weight == .semibold || weight == .bold { return .heavy }
+        return .bold
     }
 
     /// Plain text with the syntax removed — the Lock Screen's flat string.

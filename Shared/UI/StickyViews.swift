@@ -120,13 +120,138 @@ struct StickyContent: View {
     let note: Note
     var presentation: StickyPresentation
 
+    /// The sizes `.fit` tries, largest first. The first one whose text fits
+    /// the widget wins; if even the last is too big the note was never going
+    /// to fit, and the bottom fade takes it from there.
+    private static let fitScales: [CGFloat] = [4, 3.3, 2.8, 2.35, 2, 1.7, 1.42, 1.18, 0.95, 0.75]
+
     private var formatting: NoteFormatting { note.formatting }
 
-    /// The presentation with the note's own text size folded in.
-    private var sized: StickyPresentation {
-        var sized = presentation
-        sized.textScale = presentation.textScale * formatting.textSize.scale
-        return sized
+    var body: some View {
+        text
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: formatting.horizontal.frameAlignment)
+            // Long notes simply run out of room; fading the last few points is
+            // kinder than a hard cut mid-letter.
+            .mask(
+                LinearGradient(
+                    stops: [
+                        .init(color: .black, location: 0),
+                        .init(color: .black, location: 0.92),
+                        .init(color: .black.opacity(0.15), location: 1)
+                    ],
+                    startPoint: .top,
+                    endPoint: .bottom
+                )
+            )
+            .overlay {
+                if presentation.showsFold {
+                    StickyFold(color: note.color, size: presentation.scaledFold)
+                }
+            }
+            // Drawn last, and outside the fade, so the frame stays unbroken.
+            .overlay { border }
+    }
+
+    /// Either the note at the size it asked for, or — for `.fit` — the largest
+    /// of a ladder of sizes whose text still fits the space on offer.
+    ///
+    /// `ViewThatFits` measures each candidate's ideal height and takes the
+    /// first that doesn't overflow, which is exactly the question "how big can
+    /// this note be set and still be readable in full?".
+    @ViewBuilder
+    private var text: some View {
+        if let scale = formatting.textSize.scale {
+            stack(textScale: scale)
+        } else {
+            ViewThatFits(in: .vertical) {
+                stack(textScale: Self.fitScales[0])
+                stack(textScale: Self.fitScales[1])
+                stack(textScale: Self.fitScales[2])
+                stack(textScale: Self.fitScales[3])
+                stack(textScale: Self.fitScales[4])
+                stack(textScale: Self.fitScales[5])
+                stack(textScale: Self.fitScales[6])
+                stack(textScale: Self.fitScales[7])
+                stack(textScale: Self.fitScales[8])
+                stack(textScale: Self.fitScales[9])
+            }
+        }
+    }
+
+    private func stack(textScale: CGFloat) -> some View {
+        let metrics = sized(textScale)
+        return VStack(alignment: formatting.horizontal.stackAlignment, spacing: metrics.scaledBase * 0.4) {
+            // Vertical centring is two spacers rather than a frame alignment,
+            // so the footer can still sit on the bottom edge where it belongs.
+            if formatting.vertical.padsAbove { Spacer(minLength: 0) }
+
+            if showsTitle {
+                MarkdownInline.text(
+                    note.titleMarkdown,
+                    size: metrics.scaledTitle,
+                    weight: .semibold,
+                    theme: markdownStyle(textScale)
+                )
+                .foregroundStyle(note.color.ink)
+                // Two lines is a sensible cap for a title — except when the
+                // note is being fitted, where a truncated title would make
+                // "it fits" a lie and stop the ladder stepping down.
+                .lineLimit(formatting.textSize == .fit ? nil : 2)
+                .multilineTextAlignment(formatting.horizontal.textAlignment)
+                .frame(maxWidth: .infinity, alignment: formatting.horizontal.frameAlignment)
+                .fixedSize(horizontal: false, vertical: true)
+            }
+
+            if note.isEmpty {
+                Text("Empty note")
+                    .font(.system(size: metrics.scaledBase).italic())
+                    .foregroundStyle(note.color.secondaryInk)
+                    .frame(maxWidth: .infinity, alignment: formatting.horizontal.frameAlignment)
+            } else if !bodyMarkdown.isEmpty {
+                MarkdownBodyView(markdown: bodyMarkdown, style: markdownStyle(textScale))
+            }
+
+            if formatting.vertical.padsBelow { Spacer(minLength: 0) }
+
+            if presentation.showsFooter {
+                Text(note.modified, format: .dateTime.month(.abbreviated).day().hour().minute())
+                    .font(.system(size: max(8, metrics.scaledBase * 0.72), weight: .medium))
+                    .foregroundStyle(note.color.secondaryInk)
+                    .frame(maxWidth: .infinity, alignment: formatting.horizontal.frameAlignment)
+            }
+        }
+        .padding(metrics.scaledPadding)
+    }
+
+    /// The border follows the container rather than a shape of its own: inside
+    /// a widget that's the widget's own rounding, and inside the app it's the
+    /// radius `StickyCard` hands down with `.containerShape`. Nothing has to
+    /// guess what the system rounds a widget to.
+    @ViewBuilder
+    private var border: some View {
+        if let color = formatting.border.color {
+            ContainerRelativeShape()
+                .strokeBorder(
+                    color.edge,
+                    lineWidth: max(1, (formatting.border.width.points * presentation.scale).rounded())
+                )
+        }
+    }
+
+    /// The presentation with a text size folded in.
+    private func sized(_ textScale: CGFloat) -> StickyPresentation {
+        var adjusted = presentation
+        adjusted.textScale = presentation.textScale * textScale
+        return adjusted
+    }
+
+    private func markdownStyle(_ textScale: CGFloat) -> MarkdownStyle {
+        MarkdownStyle.sticky(
+            color: note.color,
+            baseSize: presentation.baseFontSize,
+            scale: presentation.scale * presentation.textScale * textScale,
+            formatting: formatting
+        )
     }
 
     /// A note that opens with a list has no title line of its own, so the
@@ -138,88 +263,6 @@ struct StickyContent: View {
 
     private var bodyMarkdown: String {
         showsTitle ? note.bodyBelowTitle : note.body
-    }
-
-    private var markdownStyle: MarkdownStyle {
-        MarkdownStyle.sticky(
-            color: note.color,
-            baseSize: presentation.baseFontSize,
-            scale: presentation.scale * presentation.textScale,
-            formatting: formatting
-        )
-    }
-
-    var body: some View {
-        VStack(alignment: formatting.horizontal.stackAlignment, spacing: sized.scaledBase * 0.4) {
-            // Vertical centring is two spacers rather than a frame alignment,
-            // so the footer can still sit on the bottom edge where it belongs.
-            if formatting.vertical.padsAbove { Spacer(minLength: 0) }
-
-            if showsTitle {
-                titleText
-                    .foregroundStyle(note.color.ink)
-                    .lineLimit(2)
-                    .multilineTextAlignment(formatting.horizontal.textAlignment)
-                    .frame(maxWidth: .infinity, alignment: formatting.horizontal.frameAlignment)
-                    .fixedSize(horizontal: false, vertical: true)
-            }
-
-            if note.isEmpty {
-                Text("Empty note")
-                    .font(.system(size: sized.scaledBase).italic())
-                    .foregroundStyle(note.color.secondaryInk)
-                    .frame(maxWidth: .infinity, alignment: formatting.horizontal.frameAlignment)
-            } else if !bodyMarkdown.isEmpty {
-                MarkdownBodyView(markdown: bodyMarkdown, style: markdownStyle)
-            }
-
-            if formatting.vertical.padsBelow { Spacer(minLength: 0) }
-
-            if presentation.showsFooter {
-                Text(note.modified, format: .dateTime.month(.abbreviated).day().hour().minute())
-                    .font(.system(size: max(8, sized.scaledBase * 0.72), weight: .medium))
-                    .foregroundStyle(note.color.secondaryInk)
-                    .frame(maxWidth: .infinity, alignment: formatting.horizontal.frameAlignment)
-            }
-        }
-        .padding(sized.scaledPadding)
-        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: formatting.horizontal.frameAlignment)
-        // Long notes simply run out of room; fading the last few points is
-        // kinder than a hard cut mid-letter.
-        .mask(
-            LinearGradient(
-                stops: [
-                    .init(color: .black, location: 0),
-                    .init(color: .black, location: 0.92),
-                    .init(color: .black.opacity(0.15), location: 1)
-                ],
-                startPoint: .top,
-                endPoint: .bottom
-            )
-        )
-        .overlay {
-            if presentation.showsFold {
-                StickyFold(color: note.color, size: presentation.scaledFold)
-            }
-        }
-    }
-
-    /// The title carries the note's own emphasis too — it's the same sentence
-    /// as the rest of the sticky, just set larger. The font is resolved here
-    /// rather than left to a `.font()` downstream, for the same reason the
-    /// markdown renderer resolves its own: a modifier applied later would
-    /// flatten it.
-    private var titleFont: Font {
-        let font = Font.system(
-            size: sized.scaledTitle,
-            weight: formatting.bold ? .heavy : .semibold
-        )
-        return formatting.italic ? font.italic() : font
-    }
-
-    private var titleText: Text {
-        let text = Text(note.title).font(titleFont)
-        return formatting.underline ? text.underline(true, color: note.color.ink) : text
     }
 }
 
@@ -233,6 +276,10 @@ struct StickyCard: View {
         StickyContent(note: note, presentation: presentation)
             .background(StickyPaper(color: note.color))
             .clipShape(RoundedRectangle(cornerRadius: presentation.cornerRadius, style: .continuous))
+            // Hands the card's own radius to the border inside, which is drawn
+            // as a `ContainerRelativeShape` so that in a widget it picks up
+            // whatever the system rounds the widget to instead.
+            .containerShape(RoundedRectangle(cornerRadius: presentation.cornerRadius, style: .continuous))
             .shadow(
                 color: shadow ? Color.black.opacity(0.16) : .clear,
                 radius: shadow ? 3 : 0,

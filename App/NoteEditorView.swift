@@ -105,7 +105,7 @@ struct NoteEditorView: View {
                 .tint(color.ink)
                 .scrollContentBackground(.hidden)
                 .focused($editorFocused)
-                .frame(minHeight: 170)
+                .frame(minHeight: 190)
                 .padding(10)
                 .background(StickyPaper(color: color))
                 .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
@@ -114,7 +114,35 @@ struct NoteEditorView: View {
                         .stroke(color.ink.opacity(editorFocused ? 0.35 : 0.12), lineWidth: 1)
                 )
 
+            markdownLegend
+
             footer(for: note)
+        }
+    }
+
+    /// Emphasis is markdown's job, not a note-wide setting, so the syntax that
+    /// works is spelled out right under the box you type it into.
+    private var markdownLegend: some View {
+        LazyVGrid(
+            columns: [GridItem(.adaptive(minimum: 96), spacing: 6)],
+            alignment: .leading,
+            spacing: 6
+        ) {
+            ForEach(MarkdownHint.all) { hint in
+                Text(hint.syntax)
+                    .font(.caption2.monospaced())
+                    .foregroundStyle(.secondary)
+                    .lineLimit(1)
+                    .padding(.horizontal, 6)
+                    .padding(.vertical, 3)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .background(
+                        RoundedRectangle(cornerRadius: 5, style: .continuous)
+                            .fill(Color.primary.opacity(0.05))
+                    )
+                    .help(hint.name)
+                    .accessibilityLabel(hint.name)
+            }
         }
     }
 
@@ -157,15 +185,24 @@ struct NoteEditorView: View {
             optionRow("Colour") { colorPicker }
 
             optionRow("Text Size") {
-                Picker(selection: $formatting.textSize) {
-                    ForEach(NoteTextSize.allCases) { size in
-                        Text(size.shortName).tag(size)
+                VStack(alignment: .leading, spacing: 6) {
+                    Picker(selection: $formatting.textSize) {
+                        ForEach(NoteTextSize.allCases) { size in
+                            Text(size.shortName).tag(size)
+                        }
+                    } label: {
+                        Text("Text Size")
                     }
-                } label: {
-                    Text("Text Size")
+                    .pickerStyle(.segmented)
+                    .labelsHidden()
+
+                    if formatting.textSize == .fit {
+                        Text("Set as large as it goes while every word still shows. Each widget size works it out for itself, so the small one lands smaller than the large one.")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
                 }
-                .pickerStyle(.segmented)
-                .labelsHidden()
             }
 
             optionRow("Align") {
@@ -194,17 +231,36 @@ struct NoteEditorView: View {
                 .labelsHidden()
             }
 
-            optionRow("Style") {
-                HStack(spacing: 8) {
-                    emphasisButton("Bold", systemImage: "bold", isOn: $formatting.bold)
-                    emphasisButton("Italic", systemImage: "italic", isOn: $formatting.italic)
-                    emphasisButton("Underline", systemImage: "underline", isOn: $formatting.underline)
-                    Spacer(minLength: 0)
-                    Button("Reset") { formatting = .standard }
-                        .buttonStyle(.borderless)
-                        .font(.caption)
-                        .disabled(formatting.isStandard)
+            optionRow("Border") {
+                VStack(alignment: .leading, spacing: 10) {
+                    HStack(spacing: 10) {
+                        borderSwatch(nil)
+                        ForEach(StickyColor.allCases) { option in
+                            borderSwatch(option)
+                        }
+                        Spacer(minLength: 0)
+                    }
+
+                    if formatting.border.isVisible {
+                        Picker(selection: $formatting.border.width) {
+                            ForEach(NoteBorderWidth.allCases) { width in
+                                Text(width.displayName).tag(width)
+                            }
+                        } label: {
+                            Text("Border Width")
+                        }
+                        .pickerStyle(.segmented)
+                        .labelsHidden()
+                    }
                 }
+            }
+
+            HStack {
+                Spacer(minLength: 0)
+                Button("Reset Formatting") { formatting = .standard }
+                    .buttonStyle(.borderless)
+                    .font(.caption)
+                    .disabled(formatting.isStandard)
             }
 
             Divider()
@@ -263,23 +319,35 @@ struct NoteEditorView: View {
         }
     }
 
-    private func emphasisButton(_ title: String, systemImage: String, isOn: Binding<Bool>) -> some View {
-        Button {
-            isOn.wrappedValue.toggle()
+    /// A ring in the border's own colour, or a dashed one for no border.
+    private func borderSwatch(_ option: StickyColor?) -> some View {
+        let isSelected = formatting.border.color == option
+        let name = option?.displayName ?? "No border"
+
+        return Button {
+            formatting.border.color = option
         } label: {
-            Image(systemName: systemImage)
-                .font(.system(size: 13, weight: .medium))
-                .frame(width: 36, height: 28)
-                .background(
-                    RoundedRectangle(cornerRadius: 7, style: .continuous)
-                        .fill(isOn.wrappedValue ? Color.accentColor.opacity(0.22) : Color.primary.opacity(0.07))
+            Circle()
+                .strokeBorder(
+                    option?.edge ?? Color.secondary.opacity(0.5),
+                    style: StrokeStyle(
+                        lineWidth: option == nil ? 1.5 : 5,
+                        dash: option == nil ? [3, 2.5] : []
+                    )
                 )
-                .foregroundStyle(isOn.wrappedValue ? Color.accentColor : Color.primary)
+                .frame(width: 22, height: 22)
+                .padding(3)
+                .overlay(
+                    Circle().stroke(
+                        isSelected ? Color.accentColor : .clear,
+                        lineWidth: 2
+                    )
+                )
         }
         .buttonStyle(.plain)
-        .help(title)
-        .accessibilityLabel(title)
-        .accessibilityAddTraits(isOn.wrappedValue ? .isSelected : [])
+        .help(name)
+        .accessibilityLabel(name)
+        .accessibilityAddTraits(isSelected ? .isSelected : [])
     }
 
     // MARK: - Countdown
@@ -610,4 +678,26 @@ struct NoteEditorView: View {
         loadedID = renamed.id
         selection = renamed.id
     }
+}
+
+/// The markdown the sticky renderer understands, as shown under the editor.
+private struct MarkdownHint: Identifiable {
+    var syntax: String
+    var name: String
+
+    var id: String { syntax }
+
+    static let all: [MarkdownHint] = [
+        MarkdownHint(syntax: "**bold**", name: "Bold"),
+        MarkdownHint(syntax: "*italic*", name: "Italic"),
+        MarkdownHint(syntax: "<u>under</u>", name: "Underline"),
+        MarkdownHint(syntax: "~~strike~~", name: "Strikethrough"),
+        MarkdownHint(syntax: "`code`", name: "Code"),
+        MarkdownHint(syntax: "# Heading", name: "Heading"),
+        MarkdownHint(syntax: "- list", name: "Bulleted list"),
+        MarkdownHint(syntax: "1. list", name: "Numbered list"),
+        MarkdownHint(syntax: "- [ ] task", name: "Task"),
+        MarkdownHint(syntax: "> quote", name: "Quote"),
+        MarkdownHint(syntax: "[link](url)", name: "Link")
+    ]
 }

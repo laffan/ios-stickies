@@ -62,6 +62,13 @@ enum NoteFile {
         return nil
     }
 
+    /// The ways a file might say "no" to something that's off by default.
+    private static func isNegative(_ raw: String) -> Bool {
+        ["none", "no", "off", "false", ""].contains(
+            raw.trimmingCharacters(in: .whitespaces).lowercased()
+        )
+    }
+
     struct Parsed {
         var body: String
         var color: StickyColor?
@@ -124,8 +131,17 @@ enum NoteFile {
             case "valign", "vertical-align", "vertical-alignment":
                 if let aligned = NoteVerticalAlignment.named(value) { formatting.vertical = aligned }
                 else { understood = false }
-            case "style", "emphasis":
-                understood = formatting.applyStyleList(value)
+            case "border", "border-color", "border-colour":
+                if let edge = StickyColor.named(value) {
+                    formatting.border.color = edge
+                } else if NoteFile.isNegative(value) {
+                    formatting.border.color = nil
+                } else {
+                    understood = false
+                }
+            case "border-width", "border-size":
+                if let width = NoteBorderWidth.named(value) { formatting.border.width = width }
+                else { understood = false }
             case "countdown", "countdown-to", "countdown-date":
                 if let target = date(from: value) { countdown.target = target }
                 else { understood = false }

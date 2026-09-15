@@ -45,6 +45,24 @@ struct Note: Identifiable, Hashable, Codable, Sendable {
         return plain.isEmpty ? stem : plain
     }
 
+    /// The same line with its *inline* markdown left in place — `**ship it**`
+    /// rather than `ship it`.
+    ///
+    /// `title` is the flattened form, which is right for a file name, a window
+    /// title or the widget's note picker. What the sticky itself draws is this
+    /// one, so emphasis on the first line renders like emphasis anywhere else.
+    var titleMarkdown: String {
+        guard let first = firstMeaningfulLine, !Note.isStructural(first.text) else { return stem }
+        // Only the heading hashes come off: they're layout, not emphasis, and
+        // the title row is already a heading.
+        let withoutHeading = first.text.replacingOccurrences(
+            of: "^#{1,6}\\s+",
+            with: "",
+            options: .regularExpression
+        )
+        return MarkdownPlainText.line(first.text).isEmpty ? stem : withoutHeading
+    }
+
     /// The body minus its title line, so a widget showing the title doesn't
     /// print the first line twice.
     var bodyBelowTitle: String {

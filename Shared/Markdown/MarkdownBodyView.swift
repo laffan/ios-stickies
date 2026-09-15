@@ -11,18 +11,17 @@ struct MarkdownStyle: Equatable {
     var ink: Color
     var secondaryInk: Color
     var linkInk: Color
-    /// Emphasis the whole note carries, merged into every span on top of what
-    /// the markdown itself asks for.
-    var emphasis = InlineStyle()
     var alignment: TextAlignment = .leading
 
+    /// `scale` already carries the note's text size — the caller resolves it,
+    /// because `.fit` has no size until the layout picks one.
     static func sticky(
         color: StickyColor,
         baseSize: CGFloat,
         scale: CGFloat = 1,
         formatting: NoteFormatting = .standard
     ) -> MarkdownStyle {
-        let resolved = (baseSize * scale * formatting.textSize.scale).rounded()
+        let resolved = (baseSize * scale).rounded()
         return MarkdownStyle(
             baseSize: resolved,
             lineSpacing: (resolved * 0.18).rounded(),
@@ -33,7 +32,6 @@ struct MarkdownStyle: Equatable {
             // every paper colour, and it survives the Lock Screen's flattening
             // because links are underlined too.
             linkInk: Color(red: 0.15, green: 0.25, blue: 0.62),
-            emphasis: formatting.baseEmphasis,
             alignment: formatting.horizontal.textAlignment
         )
     }
