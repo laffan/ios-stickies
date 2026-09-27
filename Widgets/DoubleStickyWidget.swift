@@ -91,17 +91,28 @@ struct DoubleStickyWidgetView: View {
         }
     }
 
-    /// The surface the two stickies sit on. Widgets can't be transparent, so
-    /// the gap between the notes needs something behind it.
+    /// The surface the two stickies sit on. The gap between two paper notes
+    /// needs something behind it; when every note showing is transparent the
+    /// widget is too, and each note's hairline outline does the separating.
+    @ViewBuilder
     private var backdrop: some View {
-        let base = colorScheme == .dark
-            ? Color(white: 0.11)
-            : Color(white: 0.93)
-        return LinearGradient(
-            colors: [base, base.opacity(0.82)],
-            startPoint: .top,
-            endPoint: .bottom
-        )
+        if isTransparent {
+            Color.clear
+        } else {
+            let base = colorScheme == .dark
+                ? Color(white: 0.11)
+                : Color(white: 0.93)
+            LinearGradient(
+                colors: [base, base.opacity(0.82)],
+                startPoint: .top,
+                endPoint: .bottom
+            )
+        }
+    }
+
+    private var isTransparent: Bool {
+        let notes = [entry.topNote, entry.bottomNote].compactMap { $0 }
+        return !notes.isEmpty && notes.allSatisfy { $0.color.isTransparent }
     }
 
     private var gap: CGFloat {

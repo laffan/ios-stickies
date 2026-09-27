@@ -12,18 +12,25 @@ struct MarkdownStyle: Equatable {
     var secondaryInk: Color
     var linkInk: Color
 
-    static func sticky(color: StickyColor, baseSize: CGFloat, scale: CGFloat = 1) -> MarkdownStyle {
+    static func sticky(for note: Note, baseSize: CGFloat, scale: CGFloat = 1) -> MarkdownStyle {
         MarkdownStyle(
             baseSize: (baseSize * scale).rounded(),
             lineSpacing: (baseSize * scale * 0.18).rounded(),
             blockSpacing: max(2, (baseSize * scale * 0.42).rounded()),
-            ink: color.ink,
-            secondaryInk: color.secondaryInk,
-            // One deep navy across the whole palette: dark enough to read on
-            // every paper colour, and it survives the Lock Screen's flattening
-            // because links are underlined too.
-            linkInk: Color(red: 0.15, green: 0.25, blue: 0.62)
+            ink: note.inkColor,
+            secondaryInk: note.secondaryInkColor,
+            linkInk: linkInk(for: note)
         )
+    }
+
+    /// One deep navy across the whole palette: dark enough to read on every
+    /// paper colour, and it survives the Lock Screen's flattening because
+    /// links are underlined too. A note with its own ink, or no paper, can't
+    /// promise navy will read, so its links keep the ink and rely on the
+    /// underline alone.
+    private static func linkInk(for note: Note) -> Color {
+        guard note.ink == nil, !note.color.isTransparent else { return note.inkColor }
+        return Color(red: 0.15, green: 0.25, blue: 0.62)
     }
 
     /// Heading sizes, largest first. Deliberately restrained: inside a small

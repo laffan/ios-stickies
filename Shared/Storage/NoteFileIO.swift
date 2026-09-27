@@ -97,6 +97,7 @@ enum NoteFileIO {
             fileName: fileName,
             body: parsed.body,
             color: parsed.color ?? StickyColor.derived(from: fileName),
+            ink: parsed.ink,
             created: parsed.created ?? values?.creationDate ?? modified,
             modified: modified,
             passthroughFrontMatter: parsed.passthrough

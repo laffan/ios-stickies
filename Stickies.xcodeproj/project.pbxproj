@@ -20,10 +20,12 @@
 		488F4A4055DC0085EAA4292E /* StickyLibrary.swift in Sources */ = {isa = PBXBuildFile; fileRef = B7DE86A287BAC41C3B1FCEB0 /* StickyLibrary.swift */; };
 		4B647ED885154181E3FCA6A7 /* MarkdownInline.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAFE61466CC616802F4AE5A7 /* MarkdownInline.swift */; };
 		520314879331E6A1F01553FF /* NoteFileIO.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27DACC4F685C3B0B529C3759 /* NoteFileIO.swift */; };
+		56E3AE943600170C8A9180A9 /* StickyInk.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E51DB65E22032BBCC3F267F /* StickyInk.swift */; };
 		5B5D20085A38EE9EE2307634 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10EAB708A76085AA4426150C /* SettingsView.swift */; };
 		615AEED1408DADE38C39F875 /* AppGroup.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E85CD6BE4C5ED4FB335A8F9 /* AppGroup.swift */; };
 		6250D3C2913586D33E0FE014 /* StickiesWidgetBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = F0B6AE329128A99C367A1F76 /* StickiesWidgetBundle.swift */; };
 		646A41B5F95C09872917ED44 /* StickyTimeline.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6ADCABA0674F835137FA314 /* StickyTimeline.swift */; };
+		6C16B37DD1D7503E5350D963 /* StickyInk.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E51DB65E22032BBCC3F267F /* StickyInk.swift */; };
 		6FB6B2B21B84F75DF89E3505 /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3BF032146932C9BF9CBEBA73 /* RootView.swift */; };
 		72CECADAA0B1DCF6AF167B64 /* StickyViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 942CB8D72561886050C1087C /* StickyViews.swift */; };
 		77DD7675C057880F67E963F2 /* LockScreenStickyWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = C58487C85AAB391E45E6F8D8 /* LockScreenStickyWidget.swift */; };
@@ -133,6 +135,7 @@
 		673E0EF3A6BB335510AFA33A /* Stickies-macOS.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = "Stickies-macOS.entitlements"; path = "Stickies-macOS.entitlements"; sourceTree = "<group>"; };
 		6BAEC92F7A3947BBC57828CD /* StickyColor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = StickyColor.swift; path = StickyColor.swift; sourceTree = "<group>"; };
 		6BF4CDBAE0312F0A8633ED7F /* generate_icons.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; name = generate_icons.py; path = generate_icons.py; sourceTree = "<group>"; };
+		6E51DB65E22032BBCC3F267F /* StickyInk.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = StickyInk.swift; path = StickyInk.swift; sourceTree = "<group>"; };
 		89E32102D1E00199A720A8B7 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Assets.xcassets; path = Assets.xcassets; sourceTree = "<group>"; };
 		942CB8D72561886050C1087C /* StickyViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = StickyViews.swift; path = StickyViews.swift; sourceTree = "<group>"; };
 		9A547159E7733A3675B55541 /* NoteListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = NoteListView.swift; path = NoteListView.swift; sourceTree = "<group>"; };
@@ -204,6 +207,7 @@
 				4BE5EB937CBD4FEDB4746AFA /* Note.swift */,
 				60912C17FBCA8EFFAE7BAE67 /* NoteFile.swift */,
 				6BAEC92F7A3947BBC57828CD /* StickyColor.swift */,
+				6E51DB65E22032BBCC3F267F /* StickyInk.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -361,6 +365,7 @@
 				E4C400BFD73B2B1F576F0627 /* Note.swift */,
 				8BBB2D6FFD36BFE812A95F03 /* NoteFile.swift */,
 				285121D373E1F2BA0778EAF8 /* StickyColor.swift */,
+				56E3AE943600170C8A9180A9 /* StickyInk.swift */,
 				0432CA589A541336BFD47AFB /* AppGroup.swift */,
 				8B1E48F72CC6021A6E7C59E0 /* FolderAccess.swift */,
 				F141B03B151C73BED4A75DF3 /* FolderWatcher.swift */,
@@ -388,6 +393,7 @@
 				83BE19931FA6807F9EC1B305 /* Note.swift */,
 				A8B16A397822B58C786D7A5C /* NoteFile.swift */,
 				D4077F8C4408E0C2A544263E /* StickyColor.swift */,
+				6C16B37DD1D7503E5350D963 /* StickyInk.swift */,
 				615AEED1408DADE38C39F875 /* AppGroup.swift */,
 				1F32D295CD24B40C59F3DD98 /* FolderAccess.swift */,
 				8F4046A1099BE5F996E03857 /* FolderWatcher.swift */,

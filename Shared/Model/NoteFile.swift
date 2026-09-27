@@ -9,6 +9,7 @@ import Foundation
 /// ```
 /// ---
 /// color: yellow
+/// ink: "#1F2A44"
 /// created: 2026-08-25T09:41:00Z
 /// ---
 /// # Milk
@@ -30,6 +31,7 @@ enum NoteFile {
     struct Parsed {
         var body: String
         var color: StickyColor?
+        var ink: StickyInk?
         var created: Date?
         var passthrough: [String]
     }
@@ -44,10 +46,11 @@ enum NoteFile {
               first.trimmingCharacters(in: .whitespaces) == delimiter,
               let closing = closingDelimiterIndex(in: lines)
         else {
-            return Parsed(body: trimTrailingNewlines(normalized), color: nil, created: nil, passthrough: [])
+            return Parsed(body: trimTrailingNewlines(normalized), color: nil, ink: nil, created: nil, passthrough: [])
         }
 
         var color: StickyColor?
+        var ink: StickyInk?
         var created: Date?
         var passthrough: [String] = []
 
@@ -62,7 +65,9 @@ enum NoteFile {
             let value = trimmed[trimmed.index(after: separator)...].trimmingCharacters(in: .whitespaces)
             switch key {
             case "color", "colour":
-                color = StickyColor.named(value)
+                color = StickyColor.named(unquoted(value))
+            case "ink", "text-color", "text-colour":
+                ink = StickyInk(hex: unquoted(value))
             case "created":
                 created = dateFormatter.date(from: value)
             default:
@@ -77,6 +82,7 @@ enum NoteFile {
         return Parsed(
             body: trimTrailingNewlines(lines.joined(separator: "\n")),
             color: color,
+            ink: ink,
             created: created,
             passthrough: passthrough
         )
@@ -99,6 +105,13 @@ enum NoteFile {
         return nil
     }
 
+    private static func unquoted(_ value: String) -> String {
+        guard value.count >= 2, let first = value.first, first == value.last, first == "\"" || first == "'" else {
+            return value
+        }
+        return String(value.dropFirst().dropLast())
+    }
+
     private static func trimTrailingNewlines(_ text: String) -> String {
         var result = text
         while result.hasSuffix("\n") || result.hasSuffix(" ") {
@@ -113,6 +126,9 @@ enum NoteFile {
     static func serialize(_ note: Note) -> String {
         var lines = [delimiter]
         lines.append("color: \(note.color.token)")
+        if let ink = note.ink {
+            lines.append("ink: \"\(ink.hex)\"")
+        }
         lines.append("created: \(dateFormatter.string(from: note.created))")
         lines.append(contentsOf: note.passthroughFrontMatter)
         lines.append(delimiter)

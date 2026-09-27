@@ -63,24 +63,65 @@ struct StickyPresentation: Equatable {
 }
 
 /// The paper itself: a soft top-to-bottom gradient, which is what stops a
-/// sticky from reading as a flat coloured rectangle.
+/// sticky from reading as a flat coloured rectangle. A transparent sticky has
+/// no paper, so draws nothing — not even the highlight.
 struct StickyPaper: View {
     let color: StickyColor
 
     var body: some View {
-        LinearGradient(
-            colors: [color.paperTop, color.paperBottom],
-            startPoint: .top,
-            endPoint: .bottom
-        )
-        .overlay(alignment: .top) {
+        if color.isTransparent {
+            Color.clear
+        } else {
             LinearGradient(
-                colors: [Color.white.opacity(0.35), Color.white.opacity(0)],
+                colors: [color.paperTop, color.paperBottom],
                 startPoint: .top,
                 endPoint: .bottom
             )
-            .frame(height: 26)
+            .overlay(alignment: .top) {
+                LinearGradient(
+                    colors: [Color.white.opacity(0.35), Color.white.opacity(0)],
+                    startPoint: .top,
+                    endPoint: .bottom
+                )
+                .frame(height: 26)
+            }
         }
+    }
+}
+
+/// The usual stand-in for "nothing here": a grey checkerboard. Only the app
+/// draws it, behind a transparent sticky, so there's something to see the
+/// sticky's edges and its ink against. Mid-greys, so neither light nor dark
+/// ink is favoured.
+struct TransparencyCheckerboard: View {
+    var squareSize: CGFloat = 10
+
+    var body: some View {
+        Checkerboard(squareSize: squareSize)
+            .fill(Color(white: 0.42))
+            .background(Color(white: 0.52))
+    }
+}
+
+struct Checkerboard: Shape {
+    var squareSize: CGFloat
+
+    func path(in rect: CGRect) -> Path {
+        var path = Path()
+        guard squareSize > 0 else { return path }
+        let columns = Int((rect.width / squareSize).rounded(.up))
+        let rows = Int((rect.height / squareSize).rounded(.up))
+        for row in 0..<rows {
+            for column in 0..<columns where (row + column).isMultiple(of: 2) {
+                path.addRect(CGRect(
+                    x: rect.minX + CGFloat(column) * squareSize,
+                    y: rect.minY + CGFloat(row) * squareSize,
+                    width: squareSize,
+                    height: squareSize
+                ))
+            }
+        }
+        return path
     }
 }
 
@@ -135,7 +176,7 @@ struct StickyContent: View {
 
     private var markdownStyle: MarkdownStyle {
         MarkdownStyle.sticky(
-            color: note.color,
+            for: note,
             baseSize: presentation.baseFontSize,
             scale: presentation.scale
         )
@@ -146,7 +187,7 @@ struct StickyContent: View {
             if showsTitle {
                 Text(note.title)
                     .font(.system(size: presentation.scaledTitle, weight: .semibold))
-                    .foregroundStyle(note.color.ink)
+                    .foregroundStyle(note.inkColor)
                     .lineLimit(2)
                     .fixedSize(horizontal: false, vertical: true)
             }
@@ -154,7 +195,7 @@ struct StickyContent: View {
             if note.isEmpty {
                 Text("Empty note")
                     .font(.system(size: presentation.scaledBase).italic())
-                    .foregroundStyle(note.color.secondaryInk)
+                    .foregroundStyle(note.secondaryInkColor)
             } else if !bodyMarkdown.isEmpty {
                 MarkdownBodyView(markdown: bodyMarkdown, style: markdownStyle)
             }
@@ -164,7 +205,7 @@ struct StickyContent: View {
             if presentation.showsFooter {
                 Text(note.modified, format: .dateTime.month(.abbreviated).day().hour().minute())
                     .font(.system(size: max(8, presentation.scaledBase * 0.72), weight: .medium))
-                    .foregroundStyle(note.color.secondaryInk)
+                    .foregroundStyle(note.secondaryInkColor)
             }
         }
         .padding(presentation.scaledPadding)
@@ -183,7 +224,8 @@ struct StickyContent: View {
             )
         )
         .overlay {
-            if presentation.showsFold {
+            // No paper, nothing to fold.
+            if presentation.showsFold, !note.color.isTransparent {
                 StickyFold(color: note.color, size: presentation.scaledFold)
             }
         }
@@ -191,20 +233,35 @@ struct StickyContent: View {
 }
 
 /// A complete sticky: paper, text and fold, clipped to a rounded rectangle.
+///
+/// A transparent sticky keeps its outline as a hairline in its own ink — without
+/// one, two of them stacked in a widget would run together — and drops the
+/// shadow, which would otherwise fall on the text.
 struct StickyCard: View {
     let note: Note
     var presentation: StickyPresentation
     var shadow: Bool = true
 
+    private var shape: RoundedRectangle {
+        RoundedRectangle(cornerRadius: presentation.cornerRadius, style: .continuous)
+    }
+
+    private var castsShadow: Bool { shadow && !note.color.isTransparent }
+
     var body: some View {
         StickyContent(note: note, presentation: presentation)
             .background(StickyPaper(color: note.color))
-            .clipShape(RoundedRectangle(cornerRadius: presentation.cornerRadius, style: .continuous))
+            .clipShape(shape)
+            .overlay {
+                if note.color.isTransparent {
+                    shape.strokeBorder(note.inkColor.opacity(0.22), lineWidth: 1)
+                }
+            }
             .shadow(
-                color: shadow ? Color.black.opacity(0.16) : .clear,
-                radius: shadow ? 3 : 0,
+                color: castsShadow ? Color.black.opacity(0.16) : .clear,
+                radius: castsShadow ? 3 : 0,
                 x: 0,
-                y: shadow ? 1.5 : 0
+                y: castsShadow ? 1.5 : 0
             )
     }
 }

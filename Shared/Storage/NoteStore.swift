@@ -199,8 +199,9 @@ final class NoteStore {
     }
 
     /// Rotate through the palette so a new board doesn't come out all yellow.
+    /// After a transparent note the rotation starts again from yellow.
     private func nextColor() -> StickyColor {
-        let palette = StickyColor.allCases
+        let palette = StickyColor.paperColors
         guard let mostRecent = notes.max(by: { $0.created < $1.created }),
               let index = palette.firstIndex(of: mostRecent.color)
         else {
@@ -212,7 +213,7 @@ final class NoteStore {
     /// Persist an edit. Returns the note as it now exists on disk, since the
     /// file may have been renamed to match a newly typed title.
     @discardableResult
-    func save(_ note: Note, body: String, color: StickyColor) -> Note? {
+    func save(_ note: Note, body: String, color: StickyColor, ink: StickyInk?) -> Note? {
         guard let scope = FolderAccess.resolve() else {
             lastError = NoteFileIO.IOError.folderUnavailable.localizedDescription
             return nil
@@ -222,6 +223,7 @@ final class NoteStore {
             var updated = note
             updated.body = body
             updated.color = color
+            updated.ink = ink
             updated.modified = Date()
 
             do {
@@ -297,7 +299,7 @@ final class NoteStore {
     }
 
     func setColor(_ color: StickyColor, for note: Note) {
-        save(note, body: note.body, color: color)
+        save(note, body: note.body, color: color, ink: note.ink)
     }
 
     private func replace(id: Note.ID, with note: Note) {

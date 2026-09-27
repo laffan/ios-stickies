@@ -26,7 +26,11 @@ Screen, desktop or Lock Screen with a widget.
 - **400 characters.** Enough for a real note, short enough to stay legible in
   a widget. Longer files that arrive from elsewhere are shown and flagged, not
   truncated.
-- **Six classic sticky colours**, stored in the file so they travel with it.
+- **Six classic sticky colours, or none.** A transparent sticky has no paper,
+  just its text on whatever the widget sits on. The colour is stored in the
+  file, so it travels with it.
+- **Any text colour.** Each note can have its own ink, picked with the colour
+  well beside the swatches, or left at the ink that suits its paper.
 
 ### Widgets
 
@@ -43,6 +47,23 @@ The Lock Screen widget renders in the system's single-tint mode, so sticky
 colour is deliberately dropped there and the space goes to text instead. The
 inline family is the strip directly above the clock; the rectangular family is
 the larger slot below it.
+
+**What a transparent sticky actually shows through to** depends on where the
+widget is, because WidgetKit doesn't let a widget reveal the wallpaper itself:
+
+| Where | Behind a transparent sticky |
+| --- | --- |
+| iOS Home Screen, default appearance | The system's plain widget background — white in light mode, black in dark |
+| iOS 26 Home Screen, Clear or Tinted appearance | The system's glass or tint. The text is tinted too, so custom ink is overridden |
+| macOS desktop, while another app is in front | The desktop itself. The system draws the text as a muted, monochrome silhouette, so custom ink is overridden |
+| macOS desktop when it's in front, Notification Centre | The system's usual widget background |
+| StandBy | Black — the system removes widget backgrounds there anyway |
+
+A transparent note with no ink of its own uses the system's primary text
+colour, so it stays readable in light and dark mode. A custom ink stays fixed
+whatever the mode — pick one that reads in the mode you use. In **Two
+Stickies**, the widget goes transparent only when every note it shows is; each
+transparent note gets a hairline outline so the two don't run together.
 
 ## Building it
 
@@ -139,6 +160,7 @@ so a file written by hand is a perfectly valid sticky:
 ```markdown
 ---
 color: yellow
+ink: "#1F2A44"
 created: 2026-08-25T09:41:00Z
 ---
 # Milk
@@ -146,8 +168,14 @@ created: 2026-08-25T09:41:00Z
 - **not** skim
 ```
 
-- `color` — one of `yellow`, `pink`, `blue`, `green`, `orange`, `purple`.
-  Missing? A colour is derived from the file name, stably.
+- `color` — one of `yellow`, `pink`, `blue`, `green`, `orange`, `purple`, or
+  `clear` for no paper (`transparent` and `none` are read as `clear` too).
+  Missing? A paper colour is derived from the file name, stably — never
+  `clear`.
+- `ink` — the text colour, as `#RRGGBB` or `#RGB`. Optional; without it the
+  text uses the ink that goes with the paper. Keep the quotes: in YAML an
+  unquoted `#` starts a comment, so other tools would read the value as empty.
+  `text-color` is accepted as a synonym when reading.
 - `created` — ISO 8601. Missing? The file's creation date is used.
 - Front matter keys Stickies doesn't recognise are preserved on save, so other
   tools can annotate the same files.

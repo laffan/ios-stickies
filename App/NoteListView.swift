@@ -106,7 +106,9 @@ struct NoteListView: View {
                     Label {
                         Text(color.displayName)
                     } icon: {
-                        Image(systemName: note.color == color ? "checkmark.circle.fill" : "circle.fill")
+                        Image(systemName: note.color == color
+                            ? "checkmark.circle.fill"
+                            : (color.isTransparent ? "circle.dashed" : "circle.fill"))
                     }
                 }
             }
@@ -178,16 +180,29 @@ private struct NoteRow: View {
 
     private var swatch: some View {
         ZStack(alignment: .bottomTrailing) {
-            RoundedRectangle(cornerRadius: 4, style: .continuous)
-                .fill(LinearGradient(
-                    colors: [note.color.paperTop, note.color.paperBottom],
-                    startPoint: .top,
-                    endPoint: .bottom
-                ))
-            FoldedCorner(size: 9)
-                .fill(note.color.fold)
+            if note.color.isTransparent {
+                TransparencyCheckerboard(squareSize: 6.5)
+            } else {
+                RoundedRectangle(cornerRadius: 4, style: .continuous)
+                    .fill(LinearGradient(
+                        colors: [note.color.paperTop, note.color.paperBottom],
+                        startPoint: .top,
+                        endPoint: .bottom
+                    ))
+                FoldedCorner(size: 9)
+                    .fill(note.color.fold)
+            }
         }
         .frame(width: 26, height: 26)
+        // A custom ink shows as a letter on the swatch, so the list tells
+        // notes apart the way the widgets will.
+        .overlay {
+            if note.ink != nil {
+                Text(verbatim: "A")
+                    .font(.system(size: 13, weight: .bold))
+                    .foregroundStyle(note.inkColor)
+            }
+        }
         .clipShape(RoundedRectangle(cornerRadius: 4, style: .continuous))
         .overlay(
             RoundedRectangle(cornerRadius: 4, style: .continuous)

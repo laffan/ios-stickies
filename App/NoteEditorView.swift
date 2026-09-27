@@ -5,10 +5,14 @@ import SwiftUI
 /// source; stepping away renders it exactly as a widget will.
 struct NoteEditorView: View {
     @Environment(NoteStore.self) private var store
+    /// What the colour picker's choices are resolved against.
+    @Environment(\.self) private var environment
     @Binding var selection: Note.ID?
 
     @State private var draft = ""
     @State private var color: StickyColor = .yellow
+    /// The note's own text colour; `nil` means the paper's ink.
+    @State private var ink: StickyInk?
     /// The body as it last was on disk. Anything else means unsaved edits.
     @State private var baseline = ""
     @State private var loadedID: Note.ID?
@@ -26,6 +30,8 @@ struct NoteEditorView: View {
     private let presentation = StickyPresentation.editing
 
     private var currentNote: Note? { store.note(id: selection) }
+
+    private var inkColor: Color { ink?.color ?? color.ink }
 
     /// The card draws the fold once, so the rendered content mustn't draw
     /// its own on top of it.
@@ -105,13 +111,18 @@ struct NoteEditorView: View {
 
     private func stickyCard(for note: Note) -> some View {
         ZStack(alignment: .topLeading) {
+            // A widget has something behind a transparent sticky; here the
+            // checkerboard stands in for it.
+            if color.isTransparent {
+                TransparencyCheckerboard(squareSize: 14)
+            }
             StickyPaper(color: color)
 
             if isWriting {
                 TextEditor(text: boundedDraft)
                     .font(.system(size: presentation.scaledBase))
-                    .foregroundStyle(color.ink)
-                    .tint(color.ink)
+                    .foregroundStyle(inkColor)
+                    .tint(inkColor)
                     .scrollContentBackground(.hidden)
                     .background(Color.clear)
                     .focused($editorFocused)
@@ -123,9 +134,13 @@ struct NoteEditorView: View {
                 StickyContent(note: previewNote(from: note), presentation: contentPresentation)
             }
         }
-        .overlay { StickyFold(color: color, size: presentation.scaledFold) }
+        .overlay {
+            if !color.isTransparent {
+                StickyFold(color: color, size: presentation.scaledFold)
+            }
+        }
         .clipShape(RoundedRectangle(cornerRadius: presentation.cornerRadius, style: .continuous))
-        .shadow(color: .black.opacity(0.18), radius: 8, y: 3)
+        .shadow(color: .black.opacity(color.isTransparent ? 0 : 0.18), radius: 8, y: 3)
         .aspectRatio(1, contentMode: .fit)
         .frame(maxWidth: 460, maxHeight: .infinity)
         .contentShape(RoundedRectangle(cornerRadius: presentation.cornerRadius, style: .continuous))
@@ -137,6 +152,7 @@ struct NoteEditorView: View {
         var preview = note
         preview.body = draft
         preview.color = color
+        preview.ink = ink
         return preview
     }
 
@@ -147,13 +163,9 @@ struct NoteEditorView: View {
                     color = option
                     flushSave(for: loadedID)
                 } label: {
-                    Circle()
-                        .fill(LinearGradient(
-                            colors: [option.paperTop, option.paperBottom],
-                            startPoint: .top,
-                            endPoint: .bottom
-                        ))
+                    swatch(for: option)
                         .frame(width: 24, height: 24)
+                        .clipShape(Circle())
                         .overlay(
                             Circle().stroke(
                                 option == color ? option.ink.opacity(0.9) : Color.primary.opacity(0.12),
@@ -166,7 +178,59 @@ struct NoteEditorView: View {
                 .accessibilityLabel(option.displayName)
             }
             Spacer()
+            inkPicker
         }
+    }
+
+    @ViewBuilder
+    private func swatch(for option: StickyColor) -> some View {
+        if option.isTransparent {
+            TransparencyCheckerboard(squareSize: 6)
+        } else {
+            LinearGradient(
+                colors: [option.paperTop, option.paperBottom],
+                startPoint: .top,
+                endPoint: .bottom
+            )
+        }
+    }
+
+    /// Text colour. Any note can have one; a transparent note usually wants
+    /// one, since it's the only thing on the widget.
+    private var inkPicker: some View {
+        HStack(spacing: 8) {
+            if ink != nil {
+                Button {
+                    ink = nil
+                    flushSave(for: loadedID)
+                } label: {
+                    Image(systemName: "arrow.uturn.backward.circle")
+                        .font(.system(size: 17))
+                        .foregroundStyle(.secondary)
+                }
+                .buttonStyle(.plain)
+                .help("Use the default text colour")
+                .accessibilityLabel("Reset Text Colour")
+            }
+            Image(systemName: "textformat")
+                .foregroundStyle(.secondary)
+                .accessibilityHidden(true)
+            ColorPicker("Text Colour", selection: inkSelection, supportsOpacity: false)
+                .labelsHidden()
+                .help("Text colour")
+        }
+    }
+
+    /// The picker writes continuously while it's dragged, so its saves go
+    /// through the same debounce as typing.
+    private var inkSelection: Binding<Color> {
+        Binding(
+            get: { inkColor },
+            set: { picked in
+                ink = StickyInk(picked, in: environment)
+                scheduleSave()
+            }
+        )
     }
 
     private func footer(for note: Note) -> some View {
@@ -315,19 +379,21 @@ struct NoteEditorView: View {
             draft = note.body
             baseline = note.body
             color = note.color
+            ink = note.ink
             conflictingBody = nil
             editorFocused = false
             isWriting = false
             return
         }
 
-        guard note.body != baseline || note.color != color else { return }
+        guard note.body != baseline || note.color != color || note.ink != ink else { return }
 
         if draft == baseline {
             // No local edits — take the newer version silently.
             draft = note.body
             baseline = note.body
             color = note.color
+            ink = note.ink
             conflictingBody = nil
         } else if note.body != baseline {
             conflictingBody = note.body
@@ -351,8 +417,8 @@ struct NoteEditorView: View {
         saveTask?.cancel()
         saveTask = nil
         guard let id, let note = store.note(id: id) else { return }
-        guard draft != baseline || color != note.color else { return }
-        guard let saved = store.save(note, body: draft, color: color) else { return }
+        guard draft != baseline || color != note.color || ink != note.ink else { return }
+        guard let saved = store.save(note, body: draft, color: color, ink: ink) else { return }
         baseline = saved.body
         // A first save can rename the file; follow it so the selection, and
         // this editor, stay pointed at the same note.

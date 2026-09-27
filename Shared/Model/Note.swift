@@ -14,6 +14,8 @@ struct Note: Identifiable, Hashable, Codable, Sendable {
     var fileName: String
     var body: String
     var color: StickyColor
+    /// A text colour of the note's own. `nil` means the paper's ink.
+    var ink: StickyInk? = nil
     var created: Date
     var modified: Date
     /// Front-matter keys the app doesn't understand, preserved verbatim so
