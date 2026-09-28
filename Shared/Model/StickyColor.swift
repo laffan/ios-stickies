@@ -71,6 +71,23 @@ enum StickyColor: String, CaseIterable, Codable, Sendable, Identifiable {
         }
     }
 
+    /// Border colour. Deeper and more saturated than the paper, because a
+    /// border in paper tones would vanish against any sticky it's drawn on —
+    /// a pink border has to read as pink on yellow paper.
+    var edge: Color {
+        switch self {
+        case .yellow: return Color(red: 0.78, green: 0.60, blue: 0.10)
+        case .pink: return Color(red: 0.82, green: 0.29, blue: 0.45)
+        case .blue: return Color(red: 0.18, green: 0.52, blue: 0.76)
+        case .green: return Color(red: 0.40, green: 0.64, blue: 0.20)
+        case .orange: return Color(red: 0.84, green: 0.44, blue: 0.13)
+        case .purple: return Color(red: 0.48, green: 0.42, blue: 0.82)
+        // Not offered as a border and not read from a file as one; this is
+        // only here so the switch is complete.
+        case .clear: return .primary
+        }
+    }
+
     /// The colour of the folded-over corner.
     var fold: Color {
         switch self {

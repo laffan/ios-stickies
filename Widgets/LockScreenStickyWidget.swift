@@ -45,7 +45,7 @@ struct LockScreenStickyView: View {
     }
 
     private func candidate(size: CGFloat, lineLimit: Int? = nil) -> some View {
-        VStack(alignment: .leading, spacing: 1) {
+        VStack(alignment: formatting.horizontal.stackAlignment, spacing: 1) {
             if showsTitle, !titleText.isEmpty {
                 Text(titleText)
                     .font(.system(size: size + 1, weight: .semibold))
@@ -58,7 +58,16 @@ struct LockScreenStickyView: View {
                     .lineLimit(lineLimit)
             }
         }
-        .frame(maxWidth: .infinity, alignment: .leading)
+        .multilineTextAlignment(formatting.horizontal.textAlignment)
+        .frame(maxWidth: .infinity, alignment: formatting.horizontal.frameAlignment)
+    }
+
+    /// Only the note's alignment carries over. Its text size doesn't, because
+    /// fitting the note into a slot it can't grow is this widget's whole job,
+    /// and its emphasis doesn't either: the system draws this in one tint, on
+    /// a flattened string with no markdown left in it.
+    private var formatting: NoteFormatting {
+        entry.note?.formatting ?? .standard
     }
 
     // MARK: - Text

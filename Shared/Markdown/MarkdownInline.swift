@@ -63,7 +63,9 @@ enum MarkdownInline {
         theme: MarkdownStyle
     ) -> Text {
         let inline = span.style
-        let resolvedWeight: Font.Weight = inline.bold ? .bold : weight
+        // `**bold**` inside a heading has to out-weigh the heading's own
+        // semibold, or emphasis would disappear exactly where it's loudest.
+        let resolvedWeight: Font.Weight = inline.bold ? boldWeight(over: weight) : weight
         var font: Font = inline.code
             ? .system(size: size * 0.92, weight: resolvedWeight, design: .monospaced)
             : .system(size: size, weight: resolvedWeight)
@@ -83,6 +85,14 @@ enum MarkdownInline {
             text = text.foregroundStyle(theme.linkInk)
         }
         return text
+    }
+
+    /// One step heavier than the run it sits in, so emphasis reads as emphasis
+    /// on a heading and on a title line, not just in a paragraph.
+    private static func boldWeight(over weight: Font.Weight) -> Font.Weight {
+        if weight == .heavy || weight == .black { return .black }
+        if weight == .semibold || weight == .bold { return .heavy }
+        return .bold
     }
 
     /// Plain text with the syntax removed — the Lock Screen's flat string.

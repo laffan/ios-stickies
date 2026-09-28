@@ -68,6 +68,37 @@ enum StickyResolver {
         date.addingTimeInterval(refreshInterval)
     }
 
+    /// The dates a widget showing these notes has to be drawn for.
+    ///
+    /// A widget extension isn't running when a countdown's value changes, so
+    /// every value it will show has to be drawn in advance: one entry per tick
+    /// of the finest unit on display, aligned to the target so the number
+    /// turns over at the right moment rather than up to a tick late.
+    ///
+    /// Seconds are rendered but never ticked — WidgetKit won't wake an
+    /// extension that often — so a note counting in seconds refreshes once a
+    /// minute like everything else, and a Lock Screen or Home Screen sticky is
+    /// simply not a stopwatch.
+    static func entryDates(for notes: [Note], from now: Date = Date(), limit: Int = 60) -> [Date] {
+        let ticking = notes.compactMap { note -> (interval: TimeInterval, target: Date)? in
+            guard let interval = note.tickInterval, let target = note.countdown.target else { return nil }
+            return (max(60, interval), target)
+        }
+        guard let finest = ticking.min(by: { $0.interval < $1.interval }) else { return [now] }
+
+        var dates = [now]
+        let untilBoundary = finest.target.timeIntervalSince(now)
+            .truncatingRemainder(dividingBy: finest.interval)
+        var next = now.addingTimeInterval(
+            untilBoundary <= 0 ? untilBoundary + finest.interval : untilBoundary
+        )
+        while dates.count < max(1, limit) {
+            dates.append(next)
+            next = next.addingTimeInterval(finest.interval)
+        }
+        return dates
+    }
+
     /// Resolve one selected note.
     ///
     /// Passing `nil` (a widget that was added but never configured) falls back

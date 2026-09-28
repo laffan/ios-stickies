@@ -100,6 +100,8 @@ enum NoteFileIO {
             ink: parsed.ink,
             created: parsed.created ?? values?.creationDate ?? modified,
             modified: modified,
+            formatting: parsed.formatting,
+            countdown: parsed.countdown,
             passthroughFrontMatter: parsed.passthrough
         )
     }

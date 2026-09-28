@@ -147,67 +147,39 @@ struct NoteListView: View {
     #endif
 }
 
+/// A row is the sticky's small widget, drawn the way the Home Screen will draw
+/// it. A list of titles and snippets would be easier to skim, but it wouldn't
+/// answer the question people actually have about a sticky — how much of it
+/// fits, and what it looks like once it's up there.
 private struct NoteRow: View {
+    /// Close to a real small widget (158pt) while still leaving a sidebar
+    /// narrow enough to be worth having.
+    private static let width: CGFloat = 158
+
     let note: Note
 
-    private var snippet: String {
-        let plain = MarkdownPlainText.render(note.bodyBelowTitle)
-            .replacingOccurrences(of: "\n", with: " · ")
+    /// Read to the accessibility layer as one item: the card's own text is
+    /// laid out for the eye, not for reading aloud a line at a time.
+    private var spokenDescription: String {
+        let plain = MarkdownPlainText.render(note.resolved(at: Date()).body)
+            .replacingOccurrences(of: "\n", with: ", ")
         return plain.isEmpty ? note.fileName : plain
     }
 
     var body: some View {
-        HStack(alignment: .top, spacing: 11) {
-            swatch
-            VStack(alignment: .leading, spacing: 2) {
-                Text(note.title)
-                    .font(.body.weight(.medium))
-                    .lineLimit(1)
-                Text(snippet)
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-                    .lineLimit(2)
-                if note.isOverLimit {
-                    Label("\(note.characterCount) characters", systemImage: "exclamationmark.circle")
-                        .font(.caption2)
-                        .foregroundStyle(.orange)
-                }
-            }
-            Spacer(minLength: 0)
-        }
-        .padding(.vertical, 3)
-    }
+        VStack(alignment: .leading, spacing: 5) {
+            StickyWidgetPreview(note: note, size: .small, maxWidth: Self.width)
 
-    private var swatch: some View {
-        ZStack(alignment: .bottomTrailing) {
-            if note.color.isTransparent {
-                TransparencyCheckerboard(squareSize: 6.5)
-            } else {
-                RoundedRectangle(cornerRadius: 4, style: .continuous)
-                    .fill(LinearGradient(
-                        colors: [note.color.paperTop, note.color.paperBottom],
-                        startPoint: .top,
-                        endPoint: .bottom
-                    ))
-                FoldedCorner(size: 9)
-                    .fill(note.color.fold)
+            if note.isOverLimit {
+                Label("\(note.characterCount) characters", systemImage: "exclamationmark.circle")
+                    .font(.caption2)
+                    .foregroundStyle(.orange)
             }
         }
-        .frame(width: 26, height: 26)
-        // A custom ink shows as a letter on the swatch, so the list tells
-        // notes apart the way the widgets will.
-        .overlay {
-            if note.ink != nil {
-                Text(verbatim: "A")
-                    .font(.system(size: 13, weight: .bold))
-                    .foregroundStyle(note.inkColor)
-            }
-        }
-        .clipShape(RoundedRectangle(cornerRadius: 4, style: .continuous))
-        .overlay(
-            RoundedRectangle(cornerRadius: 4, style: .continuous)
-                .stroke(note.color.ink.opacity(0.12), lineWidth: 0.5)
-        )
-        .padding(.top, 1)
+        .padding(.vertical, 5)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(note.title)
+        .accessibilityValue(spokenDescription)
     }
 }
