@@ -182,7 +182,7 @@ extension Note {
             ?? StickyColor.derived(from: fileName)
         // A malformed ink costs the note its colour, not the widget its note.
         ink = (try? container.decodeIfPresent(StickyInk.self, forKey: .ink)) ?? nil
-        created =try container.decodeIfPresent(Date.self, forKey: .created) ?? Date()
+        created = try container.decodeIfPresent(Date.self, forKey: .created) ?? Date()
         modified = try container.decodeIfPresent(Date.self, forKey: .modified) ?? created
         formatting = try container.decodeIfPresent(NoteFormatting.self, forKey: .formatting) ?? .standard
         countdown = try container.decodeIfPresent(CountdownSettings.self, forKey: .countdown)
